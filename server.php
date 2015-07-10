@@ -277,12 +277,10 @@ if(isset($_POST['method'])){
 		
 		$result = $conn->query($sql);
 		if($result->num_rows > 0){
-			$arrayAll = array();
 			foreach($result as $model){
 				$arrayAlbum = getArrayAlbum($model);
-				array_push($arrayAll, $arrayAlbum);
 			}
-			echo json_encode($arrayAll);
+			echo json_encode($arrayAlbum);
 		}else{
 			echo json_encode(array('id'=>'not_found'));	
 		}
@@ -311,6 +309,22 @@ if(isset($_POST['method'])){
 			echo json_encode($arrayProfessional);
 		}else{
 			echo json_encode(array('id'=>'not_found'));	
+		}
+	}
+	/*
+	VALIDA LOGIN
+	*/
+	else if(strcmp('login', $_POST['method']) == 0){
+		$username = $_POST['username'];
+		$password = $_POST['password'];
+		$sql = "SELECT * FROM USER WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
+		$lastId;
+		$result = $conn->query($sql);
+		
+		if($result->num_rows > 0){
+			echo json_encode(array('response'=>'true'));
+		}else{
+			echo json_encode(array('response'=>'false'));	
 		}
 	}
 }else{
