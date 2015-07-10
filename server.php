@@ -1,9 +1,34 @@
 <?php 
 header ('Content-type: text/html; charset=UTF-8');
-$host = 'localhost';
-$db = 'quebragalho';
-$user = 'quebragalho_user';
-$passwd = '@#RJQUEBRAgalho@#UFAM@#2015';
+
+/*
+* @ localhost = 0;
+* @ ica = 1;
+* @ hostinger = 2;
+*/
+$serverLocation = 0;
+
+$host;
+$db;
+$user;
+$passwd;
+
+if($serverLocation == 0){
+	$host = 'localhost';
+	$db = 'quebragalho';
+	$user = 'quebragalho_user';
+	$passwd = '@#RJQUEBRAgalho@#UFAM@#2015';
+} else if($serverLocation == 1){
+	$host = 'localhost';
+	$db = 'quebragalho';
+	$user = 'quebragalho_user';
+	$passwd = '@#RJQUEBRAgalho@#UFAM@#2015';
+} else if($serverLocation == 2){
+	$host = 'mysql.hostinger.com.br';
+	$db = 'u992178256_qg';
+	$user = 'u992178256_qg';
+	$passwd = 'shellscript';
+}
 
 $conn = new mysqli($host,$user,$passwd,$db);
 
@@ -26,6 +51,7 @@ function getArrayPro($model){
 								"sex"=>$model["SEX"],
 								"picture_profile"=>$model["PICTURE_PROFILE"],
 								"socialnet"=>$model["SOCIALNET"],
+								"is_pro"=>$model["IS_PRO"],
 								"banner"=>$model["BANNER"],
 								"city"=>$model["CITY"],
 								"state"=>$model["STATE"],
@@ -36,6 +62,19 @@ function getArrayPro($model){
 								"location"=>$model["LOCATION"],
 								"description"=>$model["DESCRIPTION"]);
 	return $arrayProfessional;
+}
+
+function getArrayUser($model){
+	$arrayUser = array("id"=>$model["ID"],
+								"name"=>$model["NAME"],
+								"email"=>$model["EMAIL"],
+								"birth"=>$model["BIRTH"],
+								"sex"=>$model["SEX"],
+								"picture_profile"=>$model["PICTURE_PROFILE"],
+								"socialnet"=>$model["SOCIALNET"],
+								"is_pro"=>$model["IS_PRO"],
+								);
+	return $arrayUser;
 }
 
 function getArrayCategory($model){
@@ -61,7 +100,6 @@ function getArrayAlbum($model){
 	return $arrayAlbum;
 }
 
-
 function selectProById($conn,$id){
 	$sql = "SELECT PROFESSIONAL.ID,
 				   PROFESSIONAL.ID_USER,
@@ -71,6 +109,7 @@ function selectProById($conn,$id){
 				   USER.SEX,
 				   USER.PICTURE_PROFILE,
 				   USER.SOCIALNET,
+				   USER.IS_PRO,
 				   PROFESSIONAL.BANNER,
 				   PROFESSIONAL.CITY,
 				   PROFESSIONAL.STATE,
@@ -85,6 +124,7 @@ function selectProById($conn,$id){
 				   WHERE PROFESSIONAL.ID_USER='".$id."'";
 		return $conn->query($sql);
 }
+
 
 if(isset($_POST['method'])){
 	if(strcmp('create-pro', $_POST['method']) == 0){ // SEND
@@ -123,6 +163,7 @@ if(isset($_POST['method'])){
 				   USER.SEX,
 				   USER.PICTURE_PROFILE,
 				   USER.SOCIALNET,
+				   USER.IS_PRO,
 				   PROFESSIONAL.BANNER,
 				   PROFESSIONAL.CITY,
 				   PROFESSIONAL.STATE,
@@ -219,6 +260,7 @@ if(isset($_POST['method'])){
 				   USER.SEX,
 				   USER.PICTURE_PROFILE,
 				   USER.SOCIALNET,
+				   USER.IS_PRO,
 				   PROFESSIONAL.BANNER,
 				   PROFESSIONAL.CITY,
 				   PROFESSIONAL.STATE,
@@ -322,9 +364,31 @@ if(isset($_POST['method'])){
 		$result = $conn->query($sql);
 		
 		if($result->num_rows > 0){
-			echo json_encode(array('response'=>'true'));
+			$arrayLogin = array();
+			foreach($result as $model){
+				$arrayLogin = array('response'=>'true','username'=>$model["EMAIL"],'is_pro'=>$model["IS_PRO"]);
+			}
+			echo json_encode($arrayLogin);
 		}else{
 			echo json_encode(array('response'=>'false'));	
+		}
+	}
+
+	/*
+	RETORNA UM USUÁRIO
+	*/
+	else if(strcmp('get-user-by-id', $_POST['method']) == 0){
+		$username = $_POST['data'];
+		$sql = "SELECT * FROM USER WHERE EMAIL='".$username."'" ;
+		$result = $conn->query($sql);
+
+		if($result->num_rows > 0){
+			foreach($result as $model){
+				$arrayUser = getArrayUser($model);
+			}
+			echo json_encode($arrayUser);
+		}else{
+			echo json_encode(array('id'=>'not_found'));	
 		}
 	}
 }else{
