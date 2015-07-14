@@ -152,6 +152,7 @@ if(isset($_POST['method'])){
 	}
 
 	/*
+	@TIPO DE RETORNO = JSONARRAY
 	RETORNAR TODOS OS PROFISSIONAIS DA BASE DE DADOS.
 	*/
 	else if(strcmp('get-all-pro', $_POST['method']) == 0){
@@ -176,19 +177,22 @@ if(isset($_POST['method'])){
 				   FROM USER JOIN PROFESSIONAL
 				   ON (USER.ID = PROFESSIONAL.ID_USER)";
 		$result = $conn->query($sql);
+		$arrayAll = array();
 		if($result->num_rows > 0){
-			$arrayAll = array();
 			foreach($result as $model){
 				$arrayProfessional = getArrayPro($model);
 				array_push($arrayAll, $arrayProfessional);
 			}
 			echo json_encode($arrayAll);
 		}else{
-			echo json_encode(array('id'=>'not_found'));	
+			array_push($arrayAll, array('id'=>'not_found'));
+			echo json_encode($arrayAll);	
+			//echo json_encode(array('id'=>'not_found'));	
 		}
 	}
 
 	/*
+	@TIPOD DE RETORNO = JSONOBJECT
 	RETORNA APENAS UM PROFISSIONAL PELO ID.
 	*/
 	else if(strcmp('get-pro-by-id', $_POST['method']) == 0){
@@ -207,6 +211,7 @@ if(isset($_POST['method'])){
 	}
 
 	/*
+	@TIPO DE RETORNO = JSONARRAY
 	RETORNA TODAS AS CATEGORIAS EXISTENTES NA BASE.
 	*/
 	else if(strcmp('get-category', $_POST['method']) == 0){
@@ -214,19 +219,22 @@ if(isset($_POST['method'])){
 		$sql = "SELECT * FROM CATEGORY";
 
 		$result = $conn->query($sql);
+		$arrayAll = array();
 		if($result->num_rows > 0){
-			$arrayAll = array();
 			foreach($result as $model){
 				$arrayCategory = getArrayCategory($model);
 				array_push($arrayAll, $arrayCategory);
 			}
 			echo json_encode($arrayAll);
 		}else{
-			echo json_encode(array('id'=>'not_found'));	
+			array_push($arrayAll, array('id'=>'not_found'));
+			echo json_encode($arrayAll);	
+			//echo json_encode(array('id'=>'not_found'));	
 		}
 	}
 
 	/*
+	@TIPO DE RETORNO = JSONARRAY
 	RETORNA TODAS AS SUBCATEGORIAS DE UMA CATEGORIA REFERENTE AO ID RECEBIDO.
 	*/
 	else if(strcmp('get-subcategory', $_POST['method']) == 0){
@@ -234,19 +242,24 @@ if(isset($_POST['method'])){
 		$sql = "SELECT * FROM SUBCATEGORY WHERE ID_CATEGORY ='".$id_category."'";
 
 		$result = $conn->query($sql);
+		$arrayAll = array();
+
 		if($result->num_rows > 0){
-			$arrayAll = array();
+			
 			foreach($result as $model){
 				$arraySubcategory = getArraySubcategory($model);
 				array_push($arrayAll, $arraySubcategory);
 			}
 			echo json_encode($arrayAll);
 		}else{
-			echo json_encode(array('id'=>'not_found'));	
+			array_push($arrayAll, array('id'=>'not_found'));
+			echo json_encode($arrayAll);	
+			//echo json_encode(array('id'=>'not_found'));	
 		}
 	}
 
 	/*
+	@TIPO DE RETORNO = JSONARRAY
 	RETORNA TODO OS PROFISSIONAIS ASSOCIADOS A UMA SUBCATEGORIA
 	*/
 	else if(strcmp('get-subcat-list-pro', $_POST['method']) == 0){
@@ -276,19 +289,23 @@ if(isset($_POST['method'])){
 				   ON (USER.ID = PROFESSIONAL.ID_USER)
 				   WHERE SUBCATEGORY.ID = '".$id_subcat."'";
 		$result = $conn->query($sql);
+		$arrayAll = array();
 		if($result->num_rows > 0){
-			$arrayAll = array();
+			
 			foreach($result as $model){
 				$arrayProfessional = getArrayPro($model);
 				array_push($arrayAll, $arrayProfessional);
 			}
 			echo json_encode($arrayAll);
 		}else{
-			echo json_encode(array('id'=>'not_found'));	
+			array_push($arrayAll, array('id'=>'not_found'));
+			echo json_encode($arrayAll);	
+			//echo json_encode(array('id'=>'not_found'));	
 		}
 	}
 
 	/*
+	@ TIPO DE RETORNO = JSONARRAY
 	RETORNA O ALBUM DE UM DETERMINADO PROFISSIONAL
 	*/
 	else if(strcmp('get-album', $_POST['method']) == 0){
@@ -297,19 +314,22 @@ if(isset($_POST['method'])){
 		$sql = "SELECT * FROM ALBUM WHERE ID_PROFESSIONAL = '".$id_professional."'";
 		
 		$result = $conn->query($sql);
+		$arrayAll = array();
 		if($result->num_rows > 0){
-			$arrayAll = array();
 			foreach($result as $model){
 				$arrayAlbum = getArrayAlbum($model);
 				array_push($arrayAll, $arrayAlbum);
 			}
 			echo json_encode($arrayAll);
 		}else{
-			echo json_encode(array('id'=>'not_found'));	
+			array_push($arrayAll, array('id'=>'not_found'));
+			echo json_encode($arrayAll);	
+			//echo json_encode(array('id'=>'not_found'));	
 		}
 	}
 
 	/*
+	@TIPO DE RETORNO = JSONOBJECT
 	RETORNA APENAS UMA FOTO DO ALBUM.
 	*/
 	else if(strcmp('get-photo', $_POST['method']) == 0){
@@ -329,6 +349,7 @@ if(isset($_POST['method'])){
 	}
 
 	/*
+	@TIPO DE RETORNO = JSONOBJECT
 	RETORNA UM ´PROFISSIONAL ALEATÓRIO
 	*/
 	else if(strcmp('get-aleatory', $_POST['method']) == 0){
@@ -354,6 +375,7 @@ if(isset($_POST['method'])){
 		}
 	}
 	/*
+	@TIPO DE RETORNO = JSONOJECT
 	VALIDA LOGIN
 	*/
 	else if(strcmp('login', $_POST['method']) == 0){
@@ -375,6 +397,7 @@ if(isset($_POST['method'])){
 	}
 
 	/*
+	@TIPO DE RETORNO = JSONOBJECT
 	RETORNA UM USUÁRIO
 	*/
 	else if(strcmp('get-user-by-id', $_POST['method']) == 0){
