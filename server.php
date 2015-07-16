@@ -122,9 +122,34 @@ function selectProById($conn,$id){
 				   FROM USER JOIN PROFESSIONAL
 				   ON (USER.ID = PROFESSIONAL.ID_USER)
 				   WHERE PROFESSIONAL.ID_USER='".$id."'";
-		return $conn->query($sql);
+	return $conn->query($sql);
 }
 
+function selectFavorites($conn,$idUserLogged){
+	$sql = "SELECT PROFESSIONAL.ID,
+				   PROFESSIONAL.ID_USER,
+				   USER.NAME,
+				   USER.EMAIL,
+				   USER.BIRTH,
+				   USER.SEX,
+				   USER.PICTURE_PROFILE,
+				   USER.SOCIALNET,
+				   USER.IS_PRO,
+				   PROFESSIONAL.BANNER,
+				   PROFESSIONAL.CITY,
+				   PROFESSIONAL.STATE,
+				   PROFESSIONAL.ADDR,
+				   PROFESSIONAL.DISTRICT,
+				   PROFESSIONAL.PHONE1,
+				   PROFESSIONAL.PHONE2,
+				   PROFESSIONAL.LOCATION,
+				   PROFESSIONAL.DESCRIPTION
+                   FROM USER JOIN PROFESSIONAL
+				   ON (USER.ID = PROFESSIONAL.ID_USER) JOIN FAVORITES
+                   ON (PROFESSIONAL.ID=FAVORITES.ID_PRO)
+                   WHERE FAVORITES.ID_USER='".$idUserLogged."'";
+	return $conn->query($sql);
+}
 
 if(isset($_POST['method'])){
 	if(strcmp('create-pro', $_POST['method']) == 0){ // SEND
@@ -414,6 +439,29 @@ if(isset($_POST['method'])){
 			echo json_encode(array('id'=>'not_found'));	
 		}
 	}
+
+	/*
+	@ TIPO DE RETORNO = JSONARRAY
+	RETORNA OS FAVORITOS DO USUARIO LOGADO
+	*/
+	else if(strcmp('get-favorites', $_POST['method']) == 0){
+
+		$idUserLogged = $_POST['data'];	
+		$result = selectFavorites($conn,$idUserLogged);
+		$arrayAll = array();
+		if($result->num_rows > 0){
+			foreach($result as $model){
+				$arrayFavorites = getArrayPro($model);
+				array_push($arrayAll, $arrayFavorites);
+			}
+			echo json_encode($arrayAll);
+		}else{
+			array_push($arrayAll, array('id'=>'not_found'));
+			echo json_encode($arrayAll);	
+			//echo json_encode(array('id'=>'not_found'));	
+		}
+	}
+
 }else{
 	/*
 	ERRO GERAL
