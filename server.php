@@ -413,11 +413,11 @@ if(isset($_POST['method'])){
 		if($result->num_rows > 0){
 			$arrayLogin = array();
 			foreach($result as $model){
-				$arrayLogin = array('response'=>'true','username'=>$model["EMAIL"],'is_pro'=>$model["IS_PRO"]);
+				$arrayLogin = getArrayUser($model);
 			}
 			echo json_encode($arrayLogin);
 		}else{
-			echo json_encode(array('response'=>'false'));	
+			echo json_encode(array('id'=>'-1'));	
 		}
 	}
 
