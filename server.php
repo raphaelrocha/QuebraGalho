@@ -462,10 +462,73 @@ if(isset($_POST['method'])){
 		}
 	}
 
+	/*
+	@ TIPO DE RETORNO = JSONOBJECT
+	MARCA UM FAVORITO
+	*/
+	else if(strcmp('set-favorite', $_POST['method']) == 0){
+		list($idUserLogged,$idProfessional) = explode(";",$_POST['data']);
+		
+		$sql = "INSERT INTO FAVORITES VALUES (".$idUserLogged.",".$idProfessional.")";
+
+		if ($conn->query($sql) === TRUE) {
+		    echo json_encode(array('id'=>'0x0x0'));
+		} else {
+		    echo json_encode(array('id'=>'0x0x1'));
+		}
+
+	}
+
+	/*
+	@ TIPO DE RETORNO = JSONOBJECT
+	DESMARCA UM FAVORITO
+	*/
+	else if(strcmp('unset-favorite', $_POST['method']) == 0){
+		list($idUserLogged,$idProfessional) = explode(";",$_POST['data']);
+		
+		$sql = "DELETE FROM FAVORITES WHERE ID_USER=".$idUserLogged." AND ID_PRO=".$idProfessional;
+
+		if ($conn->query($sql) === TRUE) {
+		    echo json_encode(array('id'=>'sucess'));
+		} else {
+		    echo json_encode(array('id'=>'error'));
+		}
+
+	}
+
+	/*
+	@ TIPO DE RETORNO = JSONOBJECT
+	VERIFICA SE É FAVORITO
+	*/
+	else if(strcmp('is-favorite', $_POST['method']) == 0){
+		list($idUserLogged,$idProfessional) = explode(";",$_POST['data']);
+		
+		$sql = "SELECT count(*) AS COUNT FROM FAVORITES WHERE ID_USER=".$idUserLogged." AND ID_PRO=".$idProfessional;
+
+		$result = $conn->query($sql);
+
+		if($result->num_rows > 0){
+			foreach($result as $model){
+				if($model['COUNT']=='1'){
+					echo json_encode(array('id'=>'true'));
+				}
+				else{
+					echo json_encode(array('id'=>'false'));
+				}
+			}
+		}else{
+			echo json_encode(array('id'=>'false'));
+		}
+	}
+
+	else{
+		echo json_encode(array('id'=>'0x1'));
+	}
+
 }else{
 	/*
 	ERRO GERAL
 	*/
-	echo json_encode(array('id'=>'0x0'));
+	echo json_encode(array('id'=>'1x0'));
 }
  ?>
