@@ -177,6 +177,45 @@ if(isset($_POST['method'])){
 	}
 
 	/*
+	@TIPO DE RETORNO = JSONOBJECT
+	CADASTRA O USUÁRIO E RETORNA CONFIRMAÇÃO.
+	*/
+	else if (strcmp('create-user', $_POST['method']) == 0){ // SEND
+		$data = utf8_encode($_POST['data']);
+		$data = json_decode($data);
+		$username = $data->email;
+		$password = $data->passwd;
+
+		$sql = "INSERT INTO USER VALUES
+				(NULL,
+				'$data->name',
+				'$data->email',
+				'$data->birth',
+				'$data->sex',
+				'$data->picture_profile',
+				'$data->socialnet',
+				'$data->passwd',
+				'$data->is_pro')";
+
+		if ($conn->query($sql) === TRUE) {
+		    $sql = "SELECT * FROM USER WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
+	
+			$result = $conn->query($sql);
+			if($result->num_rows > 0){
+				$arrayLogin = array();
+				foreach($result as $model){
+					$arrayLogin = getArrayUser($model);
+				}
+				echo json_encode($arrayLogin);
+			}else{
+				echo json_encode(array('id'=>'-1'));	
+			}
+		} else {
+		    echo json_encode(array('id'=>'0x0x1'));
+		}
+	}
+
+	/*
 	@TIPO DE RETORNO = JSONARRAY
 	RETORNAR TODOS OS PROFISSIONAIS DA BASE DE DADOS.
 	*/
