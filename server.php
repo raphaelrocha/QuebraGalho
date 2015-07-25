@@ -100,6 +100,15 @@ function getArrayAlbum($model){
 	return $arrayAlbum;
 }
 
+function getArrayCommentary($model){
+	$arrayAlbum = array('id'=>$model["ID"],
+						'id_user'=>$model["ID_USER"],
+					    'id_professional'=>$model["ID_PROFESSIONAL"],
+					    'rating'=>$model["RATING"],
+					    'phrase'=>$model["PHRASE"]);
+	return $arrayAlbum;
+}
+
 function selectProById($conn,$id){
 	$sql = "SELECT PROFESSIONAL.ID,
 				   PROFESSIONAL.ID_USER,
@@ -268,7 +277,17 @@ if(isset($_POST['method'])){
 		if($result->num_rows > 0){
 			foreach($result as $model){
 				$arrayProfessional = getArrayPro($model);
-				$arrayProfessional['rating_average']='3.3';
+				$sql = "SELECT ROUND(AVG(RATING),1) AS AVG FROM COMMENTARY WHERE ID_PROFESSIONAL=".$id;
+				$resultAvg = $conn->query($sql);
+				if($resultAvg->num_rows > 0){
+					foreach($resultAvg as $avg){
+						if($avg["AVG"]==null){
+							$arrayProfessional['rating_average']='0.0';
+						}else{
+							$arrayProfessional['rating_average']=$avg["AVG"];
+						}
+					}
+				}
 			}
 			echo json_encode($arrayProfessional);
 		}else{
@@ -435,7 +454,17 @@ if(isset($_POST['method'])){
 		if($result->num_rows > 0){
 			foreach($result as $model){
 				$arrayProfessional = getArrayPro($model);
-				$arrayProfessional['rating_average']='3.3';
+				$sql = "SELECT ROUND(AVG(RATING),1) AS AVG FROM COMMENTARY WHERE ID_PROFESSIONAL=".$id;
+				$resultAvg = $conn->query($sql);
+				if($resultAvg->num_rows > 0){
+					foreach($resultAvg as $avg){
+						if($avg["AVG"]==null){
+							$arrayProfessional['rating_average']='0.0';
+						}else{
+							$arrayProfessional['rating_average']=$avg["AVG"];
+						}
+					}
+				}
 			}
 			echo json_encode($arrayProfessional);
 		}else{
@@ -560,6 +589,87 @@ if(isset($_POST['method'])){
 					echo json_encode(array('id'=>'false'));
 				}
 			}
+		}else{
+			echo json_encode(array('id'=>'false'));
+		}
+	}
+
+
+	/*
+	@ TIPO DE RETORNO = JSONOBJECT
+	INSERE UM COMENTÁRIO
+	*/
+	else if(strcmp('set-commentary', $_POST['method']) == 0){
+		list($idUserLogged,$idProfessional,$rating,$phrase) = explode(";",$_POST['data']);
+		
+		$sql = "INSERT INTO COMMENTARY VALUES (NULL,$idUserLogged,$idProfessional,$rating,'$phrase')";
+
+		$result = $conn->query($sql);
+
+		if($result==true){
+			echo json_encode(array('id'=>'true'));
+		}else{
+			echo json_encode(array('id'=>'false'));
+		}
+	}
+
+	/*
+	@ TIPO DE RETORNO = JSONOBJECT
+	RECUPERA UM COMENTÁRIO
+	*/
+	else if(strcmp('get-commentary', $_POST['method']) == 0){
+		list($idUserLogged,$idProfessional) = explode(";",$_POST['data']);
+		
+		$sql = "SELECT * FROM COMMENTARY WHERE ID_USER=$idUserLogged AND ID_PROFESSIONAL=$idProfessional";
+
+		$result = $conn->query($sql);
+
+		if($result->num_rows > 0){
+			foreach($result as $model){
+				$getArrayCommentary = getArrayCommentary($model);
+			}
+			echo json_encode($getArrayCommentary);
+		}else{
+			echo json_encode(array('id'=>'not_found'));
+		}
+	}
+
+	/*
+	@ TIPO DE RETORNO = JSONARRAY
+	RECUPERA TODOS OS COMENTÁRIO
+	*/
+	else if(strcmp('get-all-commentary-by-id', $_POST['method']) == 0){
+		$idProfessional = $_POST['data'];
+		
+		$sql = "SELECT * FROM COMMENTARY WHERE ID_PROFESSIONAL=$idProfessional";
+
+		$result = $conn->query($sql);
+		$arrayAll = array();
+		if($result->num_rows > 0){
+
+			foreach($result as $model){
+				$getArrayCommentary = getArrayCommentary($model);
+				array_push($arrayAll, $getArrayCommentary);
+			}
+			echo json_encode($arrayAll);
+		}else{
+			echo json_encode(array('id'=>'not_found'));
+		}
+	}
+
+	/*
+	@ TIPO DE RETORNO = JSONOBJECT
+	ATUALIZA UM COMENTARIO
+	*/
+	else if(strcmp('update-commentary', $_POST['method']) == 0){
+		list($idUserLogged,$idProfessional,$rating,$phrase) = explode(";",$_POST['data']);
+		
+		$sql = "UPDATE COMMENTARY SET RATING = $rating, PHRASE = '$phrase' WHERE ID_USER=$idUserLogged AND ID_PROFESSIONAL=$idProfessional;";
+
+		$result = $conn->query($sql);
+
+		if($result==true){
+			echo json_encode(array('id'=>'true'));
 		}else{
 			echo json_encode(array('id'=>'false'));
 		}
