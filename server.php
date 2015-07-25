@@ -245,6 +245,7 @@ if(isset($_POST['method'])){
 		if($result->num_rows > 0){
 			foreach($result as $model){
 				$arrayProfessional = getArrayPro($model);
+				$arrayProfessional['rating_average']='3.3';
 				array_push($arrayAll, $arrayProfessional);
 			}
 			echo json_encode($arrayAll);
@@ -267,6 +268,7 @@ if(isset($_POST['method'])){
 		if($result->num_rows > 0){
 			foreach($result as $model){
 				$arrayProfessional = getArrayPro($model);
+				$arrayProfessional['rating_average']='3.3';
 			}
 			echo json_encode($arrayProfessional);
 		}else{
@@ -358,6 +360,7 @@ if(isset($_POST['method'])){
 			
 			foreach($result as $model){
 				$arrayProfessional = getArrayPro($model);
+				$arrayProfessional['rating_average']='3.3';
 				array_push($arrayAll, $arrayProfessional);
 			}
 			echo json_encode($arrayAll);
@@ -432,6 +435,7 @@ if(isset($_POST['method'])){
 		if($result->num_rows > 0){
 			foreach($result as $model){
 				$arrayProfessional = getArrayPro($model);
+				$arrayProfessional['rating_average']='3.3';
 			}
 			echo json_encode($arrayProfessional);
 		}else{
@@ -491,6 +495,7 @@ if(isset($_POST['method'])){
 		if($result->num_rows > 0){
 			foreach($result as $model){
 				$arrayFavorites = getArrayPro($model);
+				$arrayProfessional['rating_average']='3.3';
 				array_push($arrayAll, $arrayFavorites);
 			}
 			echo json_encode($arrayAll);
