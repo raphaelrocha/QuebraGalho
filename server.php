@@ -729,8 +729,28 @@ if(isset($_POST['method'])){
 		    array_push($arrayAll, array('id'=>'false'));
 		    echo json_encode($arrayAll);
 		}
-
 	}
+
+	/*
+	@ TIPO DE RETORNO = JSONARRAY
+	ATUALIZA UMA RESPOSTA
+	*/
+	else if(strcmp('update-response', $_POST['method']) == 0){
+		list($idResponse,$phrase) = explode(";",$_POST['data']);
+		
+		$sql = "UPDATE RESPONSE SET PHRASE = '$phrase' WHERE ID=$idResponse;";
+
+		$result = $conn->query($sql);
+		$arrayAll = array();
+		if($result==true){
+			array_push($arrayAll, array('id'=>'true'));
+		    echo json_encode($arrayAll);
+		}else{
+			array_push($arrayAll, array('id'=>'false'));
+		    echo json_encode($arrayAll);
+		}
+	}
+	
 
 	else{
 		echo json_encode(array('id'=>'0x1'));
