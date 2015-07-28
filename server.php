@@ -101,11 +101,20 @@ function getArrayAlbum($model){
 }
 
 function getArrayCommentary($model){
-	$arrayAlbum = array('id'=>$model["ID"],
-						'id_user'=>$model["ID_USER"],
-					    'id_professional'=>$model["ID_PROFESSIONAL"],
-					    'rating'=>$model["RATING"],
-					    'phrase'=>$model["PHRASE"]);
+	$arrayAlbum = array('id'=>'found',
+						'name'=>$model["NAME_USER"],
+						'picture_profile'=>$model["PICTURE_PROFILE_USER"],
+						'id_commentary'=>$model["ID_COMMENTARY"],
+						'id_user'=>$model["ID_USER_COMMENTARY"],
+						'id_professional'=>$model["ID_PROFESSIONAL_COMMENTARY"],
+						'rating'=>$model["RATING_COMMENTARY"],
+						'phrase_commentary'=>$model["PHRASE_COMMENTARY"],
+						'commentary_date_formated'=>$model["DATE_FORMATED_COMMENTARY"],
+						'id_response'=>$model["ID_RESPONSE"],
+						'email_response'=>$model["EMAIL_RESPONSE"],
+					    'response_phrase'=>$model["PHRASE_RESPONSE"],
+					    'response_date_formated'=>$model["DATE_FORMATED_RESPONSE"]);
+      
 	return $arrayAlbum;
 }
 
@@ -602,7 +611,7 @@ if(isset($_POST['method'])){
 	else if(strcmp('set-commentary', $_POST['method']) == 0){
 		list($idUserLogged,$idProfessional,$rating,$phrase) = explode(";",$_POST['data']);
 		
-		$sql = "INSERT INTO COMMENTARY VALUES (NULL,$idUserLogged,$idProfessional,$rating,'$phrase')";
+		$sql = "INSERT INTO COMMENTARY VALUES (NULL,$idUserLogged,$idProfessional,$rating,'$phrase',NULL)";
 
 		$result = $conn->query($sql);
 
@@ -620,7 +629,21 @@ if(isset($_POST['method'])){
 	else if(strcmp('get-commentary', $_POST['method']) == 0){
 		list($idUserLogged,$idProfessional) = explode(";",$_POST['data']);
 		
-		$sql = "SELECT * FROM COMMENTARY WHERE ID_USER=$idUserLogged AND ID_PROFESSIONAL=$idProfessional";
+		//$sql = "SELECT *,DATE_FORMAT(`DATE_TIME`,'%d/%m/%Y') AS `DATE_FORMATED` FROM COMMENTARY JOIN USER ON (COMMENTARY.ID_USER = USER.ID) WHERE ID_USER=$idUserLogged AND ID_PROFESSIONAL=$idProfessional";
+		$sql = "SELECT 	USER.NAME AS NAME_USER,
+						USER.PICTURE_PROFILE AS PICTURE_PROFILE_USER,
+						COMMENTARY.ID AS ID_COMMENTARY,
+						COMMENTARY.ID_USER AS ID_USER_COMMENTARY,
+						COMMENTARY.ID_PROFESSIONAL AS ID_PROFESSIONAL_COMMENTARY,
+						COMMENTARY.RATING AS RATING_COMMENTARY,
+						COMMENTARY.PHRASE AS PHRASE_COMMENTARY,
+						DATE_FORMAT(`DATE_TIME_COMMENTARY`,'%d/%m/%Y') AS `DATE_FORMATED_COMMENTARY`,
+						RESPONSE.ID AS ID_RESPONSE,
+						RESPONSE.EMAIL AS EMAIL_RESPONSE,
+                        RESPONSE.PHRASE AS PHRASE_RESPONSE,
+                   		DATE_FORMAT(`DATE_TIME_RESPONSE`,'%d/%m/%Y') AS `DATE_FORMATED_RESPONSE`
+                   FROM (COMMENTARY  LEFT JOIN USER ON (COMMENTARY.ID_USER = USER.ID)) LEFT JOIN RESPONSE ON (COMMENTARY.ID=RESPONSE.ID_COMMENTARY) 
+                   WHERE ID_USER=$idUserLogged AND ID_PROFESSIONAL=$idProfessional";
 
 		$result = $conn->query($sql);
 
@@ -641,7 +664,21 @@ if(isset($_POST['method'])){
 	else if(strcmp('get-all-commentary-by-id', $_POST['method']) == 0){
 		$idProfessional = $_POST['data'];
 		
-		$sql = "SELECT * FROM COMMENTARY WHERE ID_PROFESSIONAL=$idProfessional";
+		//$sql = "SELECT *,DATE_FORMAT(`DATE_TIME`,'%d/%m/%Y') AS `DATE_FORMATED` FROM COMMENTARY JOIN USER ON (COMMENTARY.ID_USER = USER.ID) WHERE ID_PROFESSIONAL=$idProfessional";
+		$sql = "SELECT 	USER.NAME AS NAME_USER,
+						USER.PICTURE_PROFILE AS PICTURE_PROFILE_USER,
+						COMMENTARY.ID AS ID_COMMENTARY,
+						COMMENTARY.ID_USER AS ID_USER_COMMENTARY,
+						COMMENTARY.ID_PROFESSIONAL AS ID_PROFESSIONAL_COMMENTARY,
+						COMMENTARY.RATING AS RATING_COMMENTARY,
+						COMMENTARY.PHRASE AS PHRASE_COMMENTARY,
+						DATE_FORMAT(`DATE_TIME_COMMENTARY`,'%d/%m/%Y') AS `DATE_FORMATED_COMMENTARY`,
+						RESPONSE.ID AS ID_RESPONSE,
+						RESPONSE.EMAIL AS EMAIL_RESPONSE,
+                        RESPONSE.PHRASE AS PHRASE_RESPONSE,
+                   		DATE_FORMAT(`DATE_TIME_RESPONSE`,'%d/%m/%Y') AS `DATE_FORMATED_RESPONSE`
+                   FROM (COMMENTARY  LEFT JOIN USER ON (COMMENTARY.ID_USER = USER.ID)) LEFT JOIN RESPONSE ON (COMMENTARY.ID=RESPONSE.ID_COMMENTARY) 
+                   WHERE ID_PROFESSIONAL=$idProfessional";
 
 		$result = $conn->query($sql);
 		$arrayAll = array();
@@ -653,7 +690,8 @@ if(isset($_POST['method'])){
 			}
 			echo json_encode($arrayAll);
 		}else{
-			echo json_encode(array('id'=>'not_found'));
+			array_push($arrayAll, array('id'=>'not_found'));
+			echo json_encode($arrayAll);
 		}
 	}
 
@@ -673,6 +711,25 @@ if(isset($_POST['method'])){
 		}else{
 			echo json_encode(array('id'=>'false'));
 		}
+	}
+
+	/*
+	@ TIPO DE RETORNO = JSONARRAY
+	SALVA UMA RESPOSTA
+	*/
+	else if(strcmp('set-response', $_POST['method']) == 0){
+		list($idCommentary,$emailUserLogged,$phrase) = explode(";",$_POST['data']);
+		
+		$sql = "INSERT INTO RESPONSE VALUES (NULL,'$idCommentary','$emailUserLogged','$phrase',NULL)";
+		$arrayAll = array();
+		if ($conn->query($sql) === TRUE) {
+			array_push($arrayAll, array('id'=>'true'));
+		    echo json_encode($arrayAll);
+		} else {
+		    array_push($arrayAll, array('id'=>'false'));
+		    echo json_encode($arrayAll);
+		}
+
 	}
 
 	else{
