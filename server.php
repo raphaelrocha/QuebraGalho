@@ -169,6 +169,13 @@ function selectFavorites($conn,$idUserLogged){
 	return $conn->query($sql);
 }
 
+function selectRating($conn,$idProfessional){
+	$sql = "SELECT ROUND(AVG(RATING),1) AS AVG, count(*) AS TOTAL 
+			FROM COMMENTARY 
+			WHERE ID_PROFESSIONAL=".$idProfessional;
+	return $conn->query($sql);
+}
+
 if(isset($_POST['method'])){
 	if(strcmp('create-pro', $_POST['method']) == 0){ // SEND
 		echo $_POST['data'];
@@ -263,7 +270,20 @@ if(isset($_POST['method'])){
 		if($result->num_rows > 0){
 			foreach($result as $model){
 				$arrayProfessional = getArrayPro($model);
-				$arrayProfessional['rating_average']='3.3';
+				//$sql = "SELECT ROUND(AVG(RATING),1) AS AVG, count(*) AS TOTAL FROM COMMENTARY WHERE ID_PROFESSIONAL=".$model["ID"];
+				//$resultAvg = $conn->query($sql);
+				$resultAvg = selectRating($conn,$model["ID"]);
+				if($resultAvg->num_rows > 0){
+					foreach($resultAvg as $avg){
+						if($avg["AVG"]==null){
+							$arrayProfessional['rating_average']='0.0';
+							$arrayProfessional['total_rating']='0';
+						}else{
+							$arrayProfessional['rating_average']=$avg["AVG"];
+							$arrayProfessional['total_rating']=$avg["TOTAL"];
+						}
+					}
+				}
 				array_push($arrayAll, $arrayProfessional);
 			}
 			echo json_encode($arrayAll);
@@ -286,14 +306,17 @@ if(isset($_POST['method'])){
 		if($result->num_rows > 0){
 			foreach($result as $model){
 				$arrayProfessional = getArrayPro($model);
-				$sql = "SELECT ROUND(AVG(RATING),1) AS AVG FROM COMMENTARY WHERE ID_PROFESSIONAL=".$id;
-				$resultAvg = $conn->query($sql);
+				//$sql = "SELECT ROUND(AVG(RATING),1) AS AVG, count(*) AS TOTAL FROM COMMENTARY WHERE ID_PROFESSIONAL=".$id;
+				//$resultAvg = $conn->query($sql);
+				$resultAvg = selectRating($conn,$id);
 				if($resultAvg->num_rows > 0){
 					foreach($resultAvg as $avg){
 						if($avg["AVG"]==null){
 							$arrayProfessional['rating_average']='0.0';
+							$arrayProfessional['total_rating']='0';
 						}else{
 							$arrayProfessional['rating_average']=$avg["AVG"];
+							$arrayProfessional['total_rating']=$avg["TOTAL"];
 						}
 					}
 				}
@@ -463,14 +486,17 @@ if(isset($_POST['method'])){
 		if($result->num_rows > 0){
 			foreach($result as $model){
 				$arrayProfessional = getArrayPro($model);
-				$sql = "SELECT ROUND(AVG(RATING),1) AS AVG FROM COMMENTARY WHERE ID_PROFESSIONAL=".$id;
-				$resultAvg = $conn->query($sql);
+				//$sql = "SELECT ROUND(AVG(RATING),1) AS AVG, count(*) AS TOTAL FROM COMMENTARY WHERE ID_PROFESSIONAL=".$id;
+				//$resultAvg = $conn->query($sql);
+				$resultAvg = selectRating($conn,$id);
 				if($resultAvg->num_rows > 0){
 					foreach($resultAvg as $avg){
 						if($avg["AVG"]==null){
 							$arrayProfessional['rating_average']='0.0';
+							$arrayProfessional['total_rating']='0';
 						}else{
 							$arrayProfessional['rating_average']=$avg["AVG"];
+							$arrayProfessional['total_rating']=$avg["TOTAL"];
 						}
 					}
 				}
@@ -533,7 +559,20 @@ if(isset($_POST['method'])){
 		if($result->num_rows > 0){
 			foreach($result as $model){
 				$arrayFavorites = getArrayPro($model);
-				$arrayProfessional['rating_average']='3.3';
+				//$sql = "SELECT ROUND(AVG(RATING),1) AS AVG FROM COMMENTARY WHERE ID_PROFESSIONAL=".$model['ID'];
+				//$resultAvg = $conn->query($sql);
+				$resultAvg = selectRating($conn,$model['ID']);
+				if($resultAvg->num_rows > 0){
+					foreach($resultAvg as $avg){
+						if($avg["AVG"]==null){
+							$arrayProfessional['rating_average']='0.0';
+							$arrayProfessional['total_rating']='0';
+						}else{
+							$arrayProfessional['rating_average']=$avg["AVG"];
+							$arrayProfessional['total_rating']=$avg["TOTAL"];
+						}
+					}
+				}
 				array_push($arrayAll, $arrayFavorites);
 			}
 			echo json_encode($arrayAll);
