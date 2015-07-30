@@ -176,6 +176,14 @@ function selectRating($conn,$idProfessional){
 	return $conn->query($sql);
 }
 
+function selectSubcategoryByPro($conn,$idProfessional){
+	$sql = "SELECT DESCRIPTION 
+			FROM PRO_SUBCAT JOIN SUBCATEGORY 
+			ON(SUBCATEGORY.ID=PRO_SUBCAT.ID_SUBCAT) 
+			WHERE ID_PRO=$idProfessional;";
+	return $conn->query($sql);
+}
+
 if(isset($_POST['method'])){
 	if(strcmp('create-pro', $_POST['method']) == 0){ // SEND
 		echo $_POST['data'];
@@ -278,9 +286,11 @@ if(isset($_POST['method'])){
 						if($avg["AVG"]==null){
 							$arrayProfessional['rating_average']='0.0';
 							$arrayProfessional['total_rating']='0';
+							$arrayProfessional['subcategory']="null";
 						}else{
 							$arrayProfessional['rating_average']=$avg["AVG"];
 							$arrayProfessional['total_rating']=$avg["TOTAL"];
+							$arrayProfessional['subcategory']="null";
 						}
 					}
 				}
@@ -319,6 +329,25 @@ if(isset($_POST['method'])){
 							$arrayProfessional['total_rating']=$avg["TOTAL"];
 						}
 					}
+				}
+				/*$sql = "SELECT DESCRIPTION 
+						FROM PRO_SUBCAT JOIN SUBCATEGORY 
+						ON(SUBCATEGORY.ID=PRO_SUBCAT.ID_SUBCAT) 
+						WHERE ID_PRO=$id;";
+				$resultCat = $conn->query($sql);*/
+				$resultCat = selectSubcategoryByPro($conn,$id);
+				$subcats="";
+				if($resultCat->num_rows > 0){
+					foreach($resultCat as $cat){
+						if($subcats==""){
+							$subcats = $cat["DESCRIPTION"];
+						}else{
+							$subcats = $subcats.";".$cat["DESCRIPTION"];
+						}
+					}
+					$arrayProfessional['subcategory']=$subcats;
+				}else{
+					$arrayProfessional['subcategory']="null";
 				}
 			}
 			echo json_encode($arrayProfessional);
@@ -500,6 +529,20 @@ if(isset($_POST['method'])){
 						}
 					}
 				}
+				$resultCat = selectSubcategoryByPro($conn,$id);
+				$subcats="";
+				if($resultCat->num_rows > 0){
+					foreach($resultCat as $cat){
+						if($subcats==""){
+							$subcats = $cat["DESCRIPTION"];
+						}else{
+							$subcats = $subcats.";".$cat["DESCRIPTION"];
+						}
+					}
+					$arrayProfessional['subcategory']=$subcats;
+				}else{
+					$arrayProfessional['subcategory']="null";
+				}
 			}
 			echo json_encode($arrayProfessional);
 		}else{
@@ -565,14 +608,29 @@ if(isset($_POST['method'])){
 				if($resultAvg->num_rows > 0){
 					foreach($resultAvg as $avg){
 						if($avg["AVG"]==null){
-							$arrayProfessional['rating_average']='0.0';
-							$arrayProfessional['total_rating']='0';
+							$arrayFavorites['rating_average']='0.0';
+							$arrayFavorites['total_rating']='0';
 						}else{
-							$arrayProfessional['rating_average']=$avg["AVG"];
-							$arrayProfessional['total_rating']=$avg["TOTAL"];
+							$arrayFavorites['rating_average']=$avg["AVG"];
+							$arrayFavorites['total_rating']=$avg["TOTAL"];
 						}
 					}
 				}
+				$resultCat = selectSubcategoryByPro($conn,$id);
+				$subcats="";
+				if($resultCat->num_rows > 0){
+					foreach($resultCat as $cat){
+						if($subcats==""){
+							$subcats = $cat["DESCRIPTION"];
+						}else{
+							$subcats = $subcats.";".$cat["DESCRIPTION"];
+						}
+					}
+					$arrayFavorites['subcategory']=$subcats;
+				}else{
+					$arrayFavorites['subcategory']="null";
+				}
+
 				array_push($arrayAll, $arrayFavorites);
 			}
 			echo json_encode($arrayAll);
@@ -749,6 +807,26 @@ if(isset($_POST['method'])){
 			echo json_encode(array('id'=>'true'));
 		}else{
 			echo json_encode(array('id'=>'false'));
+		}
+	}
+
+	/*
+	@ TIPO DE RETORNO = JSONOBJECT
+	REMOVE UM COMENTARIO
+	*/
+	else if(strcmp('remove-commentary', $_POST['method']) == 0){
+		$idCommentary = $_POST['data'];
+		
+		$sql = "DELETE FROM COMMENTARY WHERE ID=$idCommentary;";
+
+		$result = $conn->query($sql);
+		$arrayResponse = array();	
+		if($result==true){
+			array_push($arrayResponse, array('id'=>'true'));
+			echo json_encode($arrayResponse);
+		}else{
+			array_push($arrayResponse, array('id'=>'false'));
+			echo json_encode($arrayResponse);
 		}
 	}
 
