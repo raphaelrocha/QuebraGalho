@@ -184,6 +184,32 @@ function selectSubcategoryByPro($conn,$idProfessional){
 	return $conn->query($sql);
 }
 
+function validaEmail($email) {
+	$er = "/^(([0-9a-zA-Z]+[-._+&])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}){0,1}$/";
+    if (preg_match($er, $email)){
+	return true;
+    } else {
+	return false;
+    }
+	/*$conta = "^[a-zA-Z0-9\._-]+@";
+	$domino = "[a-zA-Z0-9\._-]+.";
+	$extensao = "([a-zA-Z0-9]{2,4})$";
+	$pattern = $conta.$domino.$extensao;
+	if (ereg($pattern, $email)){
+		return true;
+	}else{
+		return false;
+	}*/
+	/*
+	// Define uma variável para testar o validador
+	$input = "meuemail@dominio.com.br";
+	// Faz a verificação usando a função
+	if (validaEmail($input)) {
+	echo "O e-mail inserido é valido!";
+	} else {
+	echo "O e-mail inserido é invalido!";*/
+}
+
 if(isset($_POST['method'])){
 	if(strcmp('create-pro', $_POST['method']) == 0){ // SEND
 		echo $_POST['data'];
@@ -219,7 +245,12 @@ if(isset($_POST['method'])){
 		$username = $data->email;
 		$password = $data->passwd;
 
-		$sql = "INSERT INTO USER VALUES
+		//$ret = validaEmail($username);
+		//echo $ret;
+
+		//if (strpos($username,'@') !== false) {
+		if(validaEmail($username)){
+		    $sql = "INSERT INTO USER VALUES
 				(NULL,
 				'$data->name',
 				'$data->email',
@@ -230,21 +261,24 @@ if(isset($_POST['method'])){
 				'$data->passwd',
 				'$data->is_pro')";
 
-		if ($conn->query($sql) === TRUE) {
-		    $sql = "SELECT * FROM USER WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
-	
-			$result = $conn->query($sql);
-			if($result->num_rows > 0){
-				$arrayLogin = array();
-				foreach($result as $model){
-					$arrayLogin = getArrayUser($model);
+			if ($conn->query($sql) === TRUE) {
+			    $sql = "SELECT * FROM USER WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
+		
+				$result = $conn->query($sql);
+				if($result->num_rows > 0){
+					$arrayLogin = array();
+					foreach($result as $model){
+						$arrayLogin = getArrayUser($model);
+					}
+					echo json_encode($arrayLogin);
+				}else{
+					echo json_encode(array('id'=>'-1'));//login invalido	
 				}
-				echo json_encode($arrayLogin);
-			}else{
-				echo json_encode(array('id'=>'-1'));	
+			} else {
+			    echo json_encode(array('id'=>'-2'));//erro de cadastro
 			}
-		} else {
-		    echo json_encode(array('id'=>'0x0x1'));
+		}else{
+			echo json_encode(array('id'=>'-3'));//email invalido
 		}
 	}
 
