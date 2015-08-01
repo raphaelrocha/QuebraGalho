@@ -244,6 +244,52 @@ if(isset($_POST['method'])){
 		$data = json_decode($data);
 		$username = $data->email;
 		$password = $data->passwd;
+		$fileString = $data->picture_profile;
+		
+		$now = date("D M j G:i:s T Y");
+		$filename = md5($data->email.$now);
+		$filename = $filename.".jpg";
+
+		if($fileString!="vazio"){
+			$binary = base64_decode($fileString);
+		    header('Content-Type: bitmap; charset=utf-8');
+
+
+		    $file = fopen('images/__w-200-400-600-800-1000__/' . $filename, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+
+		    $file = fopen('images/w200/' . $filename, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+
+		    $file = fopen('images/w400/' . $filename, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+
+		    $file = fopen('images/w600/' . $filename, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+
+		    $file = fopen('images/w800/' . $filename, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+
+		    $file = fopen('images/w1000/' . $filename, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+		}else{
+			$filename="n_perfil.jpg";
+		}
+		
+
+
 
 		//$ret = validaEmail($username);
 		//echo $ret;
@@ -256,7 +302,7 @@ if(isset($_POST['method'])){
 				'$data->email',
 				'$data->birth',
 				'$data->sex',
-				'$data->picture_profile',
+				'$filename',
 				'$data->socialnet',
 				'$data->passwd',
 				'$data->is_pro')";
@@ -774,7 +820,8 @@ if(isset($_POST['method'])){
                         RESPONSE.PHRASE AS PHRASE_RESPONSE,
                    		DATE_FORMAT(`DATE_TIME_RESPONSE`,'%d/%m/%Y') AS `DATE_FORMATED_RESPONSE`
                    FROM (COMMENTARY  LEFT JOIN USER ON (COMMENTARY.ID_USER = USER.ID)) LEFT JOIN RESPONSE ON (COMMENTARY.ID=RESPONSE.ID_COMMENTARY) 
-                   WHERE ID_USER=$idUserLogged AND ID_PROFESSIONAL=$idProfessional";
+                   WHERE ID_USER=$idUserLogged AND ID_PROFESSIONAL=$idProfessional
+                   ORDER BY DATE_TIME_COMMENTARY";
 
 		$result = $conn->query($sql);
 
@@ -809,7 +856,8 @@ if(isset($_POST['method'])){
                         RESPONSE.PHRASE AS PHRASE_RESPONSE,
                    		DATE_FORMAT(`DATE_TIME_RESPONSE`,'%d/%m/%Y') AS `DATE_FORMATED_RESPONSE`
                    FROM (COMMENTARY  LEFT JOIN USER ON (COMMENTARY.ID_USER = USER.ID)) LEFT JOIN RESPONSE ON (COMMENTARY.ID=RESPONSE.ID_COMMENTARY) 
-                   WHERE ID_PROFESSIONAL=$idProfessional";
+                   WHERE ID_PROFESSIONAL=$idProfessional 
+                   ORDER BY DATE_TIME_COMMENTARY";
 
 		$result = $conn->query($sql);
 		$arrayAll = array();
