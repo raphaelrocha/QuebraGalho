@@ -184,6 +184,10 @@ function selectSubcategoryByPro($conn,$idProfessional){
 	return $conn->query($sql);
 }
 
+function saveFileInFolder($fileString,$filename){
+	
+}
+
 function validaEmail($email) {
 	$er = "/^(([0-9a-zA-Z]+[-._+&])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}){0,1}$/";
     if (preg_match($er, $email)){
@@ -235,6 +239,104 @@ if(isset($_POST['method'])){
 		}
 	}
 
+
+	/*
+	@ TIPO DE RETORNO = JSONARRAY
+	SALVA UMA FOTO PARA O ALBUM DO PROFISSIONAL
+	*/
+	else if(strcmp('send-photo', $_POST['method']) == 0){
+		$fileString = utf8_encode($_POST['data']);
+		$legend = utf8_encode($_POST['legend']);
+		$idPro = utf8_encode($_POST['idPro']);
+		$emailPro = utf8_encode($_POST['emailPro']);
+
+		$now = date("D M j G:i:s T Y");
+		$filename = md5($emailPro.$now);
+		$filename = $filename.".jpg";
+		$filenamersz = "rsz_".$filename;
+
+		if($fileString!="vazio"){
+			$binary = base64_decode($fileString);
+		    header('Content-Type: bitmap; charset=utf-8');
+
+		    $file = fopen('images/__w-200-400-600-800-1000__/' . $filename, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+
+		    $file = fopen('images/w200/' . $filename, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+
+		    $file = fopen('images/w400/' . $filename, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+
+		    $file = fopen('images/w600/' . $filename, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+
+		    $file = fopen('images/w800/' . $filename, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+
+		    $file = fopen('images/w1000/' . $filename, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+
+
+		    $file = fopen('images/__w-200-400-600-800-1000__/' . $filenamersz, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+
+		    $file = fopen('images/w200/' . $filenamersz, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+
+		    $file = fopen('images/w400/' . $filenamersz, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+
+		    $file = fopen('images/w600/' . $filenamersz, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+
+		    $file = fopen('images/w800/' . $filenamersz, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+
+		    $file = fopen('images/w1000/' . $filenamersz, 'wb');
+		    // Create File
+		    fwrite($file, $binary);
+		    fclose($file);
+		}else{
+			$filename="n_perfil.jpg";
+		
+		}
+
+		$sql = "INSERT INTO ALBUM VALUES (NULL,$idPro,'$legend','$filename')";
+		$arrayAll = array();
+
+		if ($conn->query($sql) === TRUE) {
+			array_push($arrayAll, array('id'=>'true'));
+			echo json_encode($arrayAll);
+		}else{
+			array_push($arrayAll, array('id'=>'false'));
+			echo json_encode($arrayAll);	
+		}
+
+	}
+
 	/*
 	@TIPO DE RETORNO = JSONOBJECT
 	CADASTRA O USUÁRIO E RETORNA CONFIRMAÇÃO.
@@ -250,10 +352,10 @@ if(isset($_POST['method'])){
 		$filename = md5($data->email.$now);
 		$filename = $filename.".jpg";
 
+
 		if($fileString!="vazio"){
 			$binary = base64_decode($fileString);
 		    header('Content-Type: bitmap; charset=utf-8');
-
 
 		    $file = fopen('images/__w-200-400-600-800-1000__/' . $filename, 'wb');
 		    // Create File
@@ -288,9 +390,6 @@ if(isset($_POST['method'])){
 			$filename="n_perfil.jpg";
 		}
 		
-
-
-
 		//$ret = validaEmail($username);
 		//echo $ret;
 
