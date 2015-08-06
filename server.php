@@ -246,6 +246,7 @@ if(isset($_POST['method'])){
 	*/
 	else if(strcmp('send-photo', $_POST['method']) == 0){
 		$fileString = utf8_encode($_POST['data']);
+		$fileStringRsz = utf8_encode($_POST['imgRsz']);
 		$legend = utf8_encode($_POST['legend']);
 		$idPro = utf8_encode($_POST['idPro']);
 		$emailPro = utf8_encode($_POST['emailPro']);
@@ -253,6 +254,7 @@ if(isset($_POST['method'])){
 		$now = date("D M j G:i:s T Y");
 		$filename = md5($emailPro.$now);
 		$filename = $filename.".jpg";
+
 		$filenamersz = "rsz_".$filename;
 
 		if($fileString!="vazio"){
@@ -290,38 +292,40 @@ if(isset($_POST['method'])){
 		    fclose($file);
 
 
-		    $file = fopen('images/__w-200-400-600-800-1000__/' . $filenamersz, 'wb');
-		    // Create File
-		    fwrite($file, $binary);
-		    fclose($file);
+		    $binaryRsz = base64_decode($fileStringRsz);
+		    header('Content-Type: bitmap; charset=utf-8');
 
-		    $file = fopen('images/w200/' . $filenamersz, 'wb');
+		    $file1 = fopen('images/__w-200-400-600-800-1000__/' . $filenamersz, 'wb');
 		    // Create File
-		    fwrite($file, $binary);
-		    fclose($file);
+		    fwrite($file1, $binaryRsz);
+		    fclose($file1);
 
-		    $file = fopen('images/w400/' . $filenamersz, 'wb');
+		    $file1 = fopen('images/w200/' . $filenamersz, 'wb');
 		    // Create File
-		    fwrite($file, $binary);
-		    fclose($file);
+		    fwrite($file1, $binaryRsz);
+		    fclose($file1);
 
-		    $file = fopen('images/w600/' . $filenamersz, 'wb');
+		    $file1 = fopen('images/w400/' . $filenamersz, 'wb');
 		    // Create File
-		    fwrite($file, $binary);
-		    fclose($file);
+		    fwrite($file1, $binaryRsz);
+		    fclose($file1);
 
-		    $file = fopen('images/w800/' . $filenamersz, 'wb');
+		    $file1 = fopen('images/w600/' . $filenamersz, 'wb');
 		    // Create File
-		    fwrite($file, $binary);
-		    fclose($file);
+		    fwrite($file1, $binaryRsz);
+		    fclose($file1);
 
-		    $file = fopen('images/w1000/' . $filenamersz, 'wb');
+		    $file1 = fopen('images/w800/' . $filenamersz, 'wb');
 		    // Create File
-		    fwrite($file, $binary);
-		    fclose($file);
+		    fwrite($file1, $binaryRsz);
+		    fclose($file1);
+
+		    $file1 = fopen('images/w1000/' . $filenamersz, 'wb');
+		    // Create File
+		    fwrite($file1, $binaryRsz);
+		    fclose($file1);
 		}else{
 			$filename="n_perfil.jpg";
-		
 		}
 
 		$sql = "INSERT INTO ALBUM VALUES (NULL,$idPro,'$legend','$filename')";
