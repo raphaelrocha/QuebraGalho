@@ -240,20 +240,30 @@ if(isset($_POST['method'])){
 	}
 
 
+
+
 	/*
 	@ TIPO DE RETORNO = JSONARRAY
 	SALVA UMA FOTO PARA O ALBUM DO PROFISSIONAL
 	*/
 	else if(strcmp('send-photo', $_POST['method']) == 0){
-		$fileString = utf8_encode($_POST['data']);
+		$data = utf8_encode($_POST['data']);
+		$data = json_decode($data);
+		$fileString = $data->photo;
+		$fileStringRsz = $data->photo_rsz;
+		$legend = $data->legend;
+		$idPro = $data->id_pro;
+		$emailPro = $data->email_pro;
+		$ext = $data->extension;
+		/*$fileString = utf8_encode($_POST['data']);
 		$fileStringRsz = utf8_encode($_POST['imgRsz']);
 		$legend = utf8_encode($_POST['legend']);
 		$idPro = utf8_encode($_POST['idPro']);
-		$emailPro = utf8_encode($_POST['emailPro']);
+		$emailPro = utf8_encode($_POST['emailPro']);*/
 
 		$now = date("D M j G:i:s T Y");
 		$filename = md5($emailPro.$now);
-		$filename = $filename.".jpg";
+		$filename = $filename.".".$ext;
 
 		$filenamersz = "rsz_".$filename;
 
@@ -328,7 +338,7 @@ if(isset($_POST['method'])){
 			$filename="n_perfil.jpg";
 		}
 
-		$sql = "INSERT INTO ALBUM VALUES (NULL,$idPro,'$legend','$filename')";
+		$sql = "INSERT INTO ALBUM VALUES (NULL,$idPro,'$legend','$filename',NULL)";
 		$arrayAll = array();
 
 		if ($conn->query($sql) === TRUE) {
@@ -351,10 +361,11 @@ if(isset($_POST['method'])){
 		$username = $data->email;
 		$password = $data->passwd;
 		$fileString = $data->picture_profile;
+		$ext = $data->extension;
 		
 		$now = date("D M j G:i:s T Y");
 		$filename = md5($data->email.$now);
-		$filename = $filename.".jpg";
+		$filename = $filename.".".$ext ;
 
 
 		if($fileString!="vazio"){
@@ -408,7 +419,8 @@ if(isset($_POST['method'])){
 				'$filename',
 				'$data->socialnet',
 				'$data->passwd',
-				'$data->is_pro')";
+				'$data->is_pro',
+				NULL)";
 
 			if ($conn->query($sql) === TRUE) {
 			    $sql = "SELECT * FROM USER WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
@@ -641,7 +653,7 @@ if(isset($_POST['method'])){
 	else if(strcmp('get-album', $_POST['method']) == 0){
 
 		$id_professional = $_POST['data'];
-		$sql = "SELECT * FROM ALBUM WHERE ID_PROFESSIONAL = '".$id_professional."'";
+		$sql = "SELECT * FROM ALBUM WHERE ID_PROFESSIONAL = '".$id_professional."' ORDER BY DATE_TIME_ALBUM DESC";
 		
 		$result = $conn->query($sql);
 		$arrayAll = array();
@@ -831,7 +843,7 @@ if(isset($_POST['method'])){
 	else if(strcmp('set-favorite', $_POST['method']) == 0){
 		list($idUserLogged,$idProfessional) = explode(";",$_POST['data']);
 		
-		$sql = "INSERT INTO FAVORITES VALUES (".$idUserLogged.",".$idProfessional.")";
+		$sql = "INSERT INTO FAVORITES VALUES (".$idUserLogged.",".$idProfessional.",NULL)";
 
 		if ($conn->query($sql) === TRUE) {
 		    echo json_encode(array('id'=>'0x0x0'));
@@ -1052,8 +1064,23 @@ if(isset($_POST['method'])){
 		    echo json_encode($arrayAll);
 		}
 	}
-	
 
+	/*
+	@TIPO DE RETORNO = JSONOBJECT
+	EXCLUI UMA FOTO.
+	*/
+	else if(strcmp('delete-photo', $_POST['method']) == 0){
+		$id = $_POST['data'];
+
+		$sql = "DELETE FROM ALBUM WHERE ID=".$id;
+
+		if ($conn->query($sql) === TRUE) {
+		    echo json_encode(array('id'=>'true'));
+		} else {
+		    echo json_encode(array('id'=>'false'));
+		}
+	}
+	
 	else{
 		echo json_encode(array('id'=>'0x1'));
 	}
