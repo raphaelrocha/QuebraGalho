@@ -93,6 +93,17 @@ function getArraySubcategory($model){
 	return $arraySubcategory;
 }
 
+function getArraySubcWithCat($model){
+	$arraySubcategory = array('id_cat'=>$model["ID_CAT"],
+							  'name_cat'=>$model["NAME_CAT"],
+						      'ic_cat'=>$model["IC_CAT"],
+						      'id_subcat'=>$model["ID_SUBCAT"],
+							  'name_subcat'=>$model["NAME_SUBCAT"],
+						      'ic_subcat'=>$model["IC_SUBCAT"],
+						      );
+	return $arraySubcategory;
+}
+
 function getArrayAlbum($model){
 	$arrayAlbum = array('id'=>$model["ID"],
 					    'id_professional'=>$model["ID_PROFESSIONAL"],
@@ -1150,6 +1161,34 @@ if(isset($_POST['method'])){
 		}else{
 			array_push($arrayAll, array('id'=>'false'));
 		    echo json_encode($arrayAll);
+		}
+	}
+
+	/*
+	@ TIPO DE RETORNO = JSONARRAY
+	RETORNAR SUBCATEGORIAS AGRUPADAS POR CATEGORIAS
+	*/
+	else if(strcmp('get-all-subcat-with-cat', $_POST['method']) == 0){	
+		$sql = "SELECT  CATEGORY.ID AS ID_CAT,
+						CATEGORY.DESCRIPTION AS NAME_CAT,
+				        CATEGORY.IC AS IC_CAT,
+						SUBCATEGORY.ID AS ID_SUBCAT,
+					    SUBCATEGORY.DESCRIPTION AS NAME_SUBCAT,
+					    SUBCATEGORY.IC AS IC_SUBCAT
+				FROM CATEGORY JOIN SUBCATEGORY ON( CATEGORY.ID = SUBCATEGORY.ID_CATEGORY)
+				ORDER BY CATEGORY.DESCRIPTION, SUBCATEGORY.DESCRIPTION;";
+
+		$result = $conn->query($sql);
+		$arrayAll = array();
+		if($result->num_rows > 0){
+			foreach($result as $model){
+				$arraySubCatWithCat = getArraySubcWithCat($model);
+				array_push($arrayAll, $arraySubCatWithCat);
+			}
+			echo json_encode($arrayAll);
+		}else{
+			array_push($arrayAll, array('id'=>'not_found'));
+			echo json_encode($arrayAll);
 		}
 	}
 
