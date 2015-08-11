@@ -73,6 +73,7 @@ function getArrayUser($model){
 								"picture_profile"=>$model["PICTURE_PROFILE"],
 								"socialnet"=>$model["SOCIALNET"],
 								"is_pro"=>$model["IS_PRO"],
+								"id_pro"=>$model["ID_PRO"],
 								);
 	return $arrayUser;
 }
@@ -139,7 +140,7 @@ function selectProById($conn,$id){
 				   PROFESSIONAL.DESCRIPTION
 				   FROM USER JOIN PROFESSIONAL
 				   ON (USER.ID = PROFESSIONAL.ID_USER)
-				   WHERE PROFESSIONAL.ID_USER='".$id."'";
+				   WHERE PROFESSIONAL.ID='".$id."'";
 	return $conn->query($sql);
 }
 
@@ -301,7 +302,7 @@ if(isset($_POST['method'])){
 					NULL)";
 
 				if ($conn->query($sql) === TRUE) {
-					$sql = "SELECT * FROM USER WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
+					$sql = "SELECT *,(PROFESSIONAL.ID)AS ID_PRO FROM USER LEFT JOIN PROFESSIONAL ON (USER.ID=PROFESSIONAL.ID_USER)  WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
 		
 					$result = $conn->query($sql);
 					if($result->num_rows > 0){
@@ -510,7 +511,7 @@ if(isset($_POST['method'])){
 				NULL)";
 
 			if ($conn->query($sql) === TRUE) {
-			    $sql = "SELECT * FROM USER WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
+			    $sql = "SELECT *,(PROFESSIONAL.ID)AS ID_PRO FROM USER LEFT JOIN PROFESSIONAL ON (USER.ID=PROFESSIONAL.ID_USER) WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
 		
 				$result = $conn->query($sql);
 				if($result->num_rows > 0){
@@ -838,7 +839,7 @@ if(isset($_POST['method'])){
 	else if(strcmp('login', $_POST['method']) == 0){
 		$username = $_POST['username'];
 		$password = $_POST['password'];
-		$sql = "SELECT * FROM USER WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
+		$sql = "SELECT *,(PROFESSIONAL.ID)AS ID_PRO FROM USER LEFT JOIN PROFESSIONAL ON (USER.ID=PROFESSIONAL.ID_USER) WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
 		$lastId;
 		$result = $conn->query($sql);
 		
@@ -859,7 +860,7 @@ if(isset($_POST['method'])){
 	*/
 	else if(strcmp('get-user-by-id', $_POST['method']) == 0){
 		$username = $_POST['data'];
-		$sql = "SELECT * FROM USER WHERE EMAIL='".$username."'" ;
+		$sql = "SELECT *,(PROFESSIONAL.ID)AS ID_PRO FROM USER LEFT JOIN PROFESSIONAL ON (USER.ID=PROFESSIONAL.ID_USER) WHERE EMAIL='".$username."'" ;
 		$result = $conn->query($sql);
 
 		if($result->num_rows > 0){
