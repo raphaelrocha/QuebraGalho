@@ -195,51 +195,135 @@ function validaEmail($email) {
     } else {
 	return false;
     }
-	/*$conta = "^[a-zA-Z0-9\._-]+@";
-	$domino = "[a-zA-Z0-9\._-]+.";
-	$extensao = "([a-zA-Z0-9]{2,4})$";
-	$pattern = $conta.$domino.$extensao;
-	if (ereg($pattern, $email)){
-		return true;
-	}else{
-		return false;
-	}*/
-	/*
-	// Define uma variável para testar o validador
-	$input = "meuemail@dominio.com.br";
-	// Faz a verificação usando a função
-	if (validaEmail($input)) {
-	echo "O e-mail inserido é valido!";
-	} else {
-	echo "O e-mail inserido é invalido!";*/
+}
+
+function saveFile($fileString,$filename){
+	$binary = base64_decode($fileString);
+    header('Content-Type: bitmap; charset=utf-8');
+
+    $file = fopen('images/__w-200-400-600-800-1000__/' . $filename, 'wb');
+    // Create File
+    fwrite($file, $binary);
+    fclose($file);
+
+    $file = fopen('images/w200/' . $filename, 'wb');
+    // Create File
+    fwrite($file, $binary);
+    fclose($file);
+
+    $file = fopen('images/w400/' . $filename, 'wb');
+    // Create File
+    fwrite($file, $binary);
+    fclose($file);
+
+    $file = fopen('images/w600/' . $filename, 'wb');
+    // Create File
+    fwrite($file, $binary);
+    fclose($file);
+
+    $file = fopen('images/w800/' . $filename, 'wb');
+    // Create File
+    fwrite($file, $binary);
+    fclose($file);
+
+    $file = fopen('images/w1000/' . $filename, 'wb');
+    // Create File
+    fwrite($file, $binary);
+    fclose($file);
+
+    return true;
 }
 
 if(isset($_POST['method'])){
 	if(strcmp('create-pro', $_POST['method']) == 0){ // SEND
-		echo $_POST['data'];
-		$model = new Professional;
 		$data = utf8_encode($_POST['data']);
+		$data2 = utf8_encode($_POST['data2']);
 		$data = json_decode($data);
+		$data2 = json_decode($data2);
 
-		$model->NAME = $data->name;
-		$model->SEX = $data->sex;
-		$model->BIRTH = $data->birth;
-		$model->ADDR = $data->addr;
-		$model->FONE1 = $data->fone1;
-		$model->FONE2 = $data->fone2;
-		$model->SOCIALNET = $data->socialnet;
-		$model->EMAIL = $data->email;
-		$model->LOCATION = $data->location;
-		$model->PASSWD = $data->passwd;
-		$model->DESCRIPTION = $data->description;
+		$username = $data->email;
+		$password = $data->passwd;
+		$fileString = $data->picture_profile;
+		$ext = $data->extension;
 		
-		if(!$model->save()){
-			echo"error";
-			print_r($model->getErrors());
+		$now = date("D M j G:i:s T Y");
+		$filename = md5($data->email.$now);
+		$filename = $filename.".".$ext ;
+
+
+		if($fileString!="vazio"){
+			$returnFileSave = saveFile($fileString,$filename);
+		}else{
+			$filename="n_perfil.jpg";
+		}
+		
+		if(validaEmail($username)){
+		    $sql = "INSERT INTO USER VALUES
+				(NULL,
+				'$data->name',
+				'$data->email',
+				'$data->birth',
+				'$data->sex',
+				'$filename',
+				'$data->socialnet',
+				'$data->passwd',
+				'$data->is_pro',
+				NULL)";
+
+			if ($conn->query($sql) === TRUE) {
+				$userID = $conn->insert_id;
+				$fileStringBanner = $data2->banner;
+				$extBanner = $data2->extension_banner;
+				
+				$now = date("D M j G:i:s T Y");
+				$filenameBanner = md5($data->email.$now.banner);
+				$filenameBanner = $filenameBanner.".".$extBanner ;
+
+				if($fileString!="vazio"){
+					$returnFileSaveBanner = saveFile($fileStringBanner,$filenameBanner);
+				}else{
+					$filenameBanner="default_banner.jpg";
+				}
+
+				$sql = "";
+				$sql = "INSERT INTO PROFESSIONAL VALUES
+					(NULL,
+					'$userID',
+					'$filenameBanner',
+					'$data2->city',
+					'$data2->state',
+					'$data2->addr',
+					'$data2->district',
+					'$data2->phone1',
+					'$data2->phone2',
+					'$data2->location',
+					'$data2->description',
+					NULL)";
+
+				if ($conn->query($sql) === TRUE) {
+					$sql = "SELECT * FROM USER WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
+		
+					$result = $conn->query($sql);
+					if($result->num_rows > 0){
+						$arrayLogin = array();
+						foreach($result as $model){
+							$arrayLogin = getArrayUser($model);
+						}
+						echo json_encode($arrayLogin);
+					}else{
+						echo json_encode(array('id'=>'-1'));//login invalido	
+					}
+				} else {
+				    echo json_encode(array('id'=>'-2'));//erro de cadastro
+				}
+			  
+			} else {
+			    echo json_encode(array('id'=>'-2'));//erro de cadastro
+			}
+		}else{
+			echo json_encode(array('id'=>'-3'));//email invalido
 		}
 	}
-
-
 
 
 	/*
@@ -268,7 +352,8 @@ if(isset($_POST['method'])){
 		$filenamersz = "rsz_".$filename;
 
 		if($fileString!="vazio"){
-			$binary = base64_decode($fileString);
+			$returnFileSave = saveFile($fileString,$filename);
+			/*$binary = base64_decode($fileString);
 		    header('Content-Type: bitmap; charset=utf-8');
 
 		    $file = fopen('images/__w-200-400-600-800-1000__/' . $filename, 'wb');
@@ -299,10 +384,11 @@ if(isset($_POST['method'])){
 		    $file = fopen('images/w1000/' . $filename, 'wb');
 		    // Create File
 		    fwrite($file, $binary);
-		    fclose($file);
+		    fclose($file);*/
 
 
-		    $binaryRsz = base64_decode($fileStringRsz);
+		    $returnFileSaveIcon = saveFile($fileStringRsz,$filenamersz);
+		    /*$binaryRsz = base64_decode($fileStringRsz);
 		    header('Content-Type: bitmap; charset=utf-8');
 
 		    $file1 = fopen('images/__w-200-400-600-800-1000__/' . $filenamersz, 'wb');
@@ -333,7 +419,7 @@ if(isset($_POST['method'])){
 		    $file1 = fopen('images/w1000/' . $filenamersz, 'wb');
 		    // Create File
 		    fwrite($file1, $binaryRsz);
-		    fclose($file1);
+		    fclose($file1);*/
 		}else{
 			$filename="n_perfil.jpg";
 		}
@@ -369,7 +455,8 @@ if(isset($_POST['method'])){
 
 
 		if($fileString!="vazio"){
-			$binary = base64_decode($fileString);
+			$returnFileSave = saveFile($fileString,$filename);
+			/*$binary = base64_decode($fileString);
 		    header('Content-Type: bitmap; charset=utf-8');
 
 		    $file = fopen('images/__w-200-400-600-800-1000__/' . $filename, 'wb');
@@ -400,7 +487,7 @@ if(isset($_POST['method'])){
 		    $file = fopen('images/w1000/' . $filename, 'wb');
 		    // Create File
 		    fwrite($file, $binary);
-		    fclose($file);
+		    fclose($file);*/
 		}else{
 			$filename="n_perfil.jpg";
 		}
