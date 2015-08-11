@@ -94,7 +94,8 @@ function getArraySubcategory($model){
 }
 
 function getArraySubcWithCat($model){
-	$arraySubcategory = array('id_cat'=>$model["ID_CAT"],
+	$arraySubcategory = array('id'=>'found',
+							  'id_cat'=>$model["ID_CAT"],
 							  'name_cat'=>$model["NAME_CAT"],
 						      'ic_cat'=>$model["IC_CAT"],
 						      'id_subcat'=>$model["ID_SUBCAT"],
