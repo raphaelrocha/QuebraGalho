@@ -1208,6 +1208,40 @@ if(isset($_POST['method'])){
 		    echo json_encode(array('id'=>'false'));
 		}
 	}
+
+	/*
+	@ TIPO DE RETORNO = JSONARRAY
+	MARCA AS SUBCATEGORIAS
+	*/
+	else if(strcmp('set-category', $_POST['method']) == 0){
+		$data = utf8_encode($_POST['data']);
+		$data = json_decode($data);
+		$id_pro =$_POST['id_pro'];
+		$fail=0;
+		$sucess=0;
+
+		foreach ($data as $value) {
+			$sql = "INSERT INTO PRO_SUBCAT VALUES($id_pro,$value,NULL)";
+			if ($conn->query($sql) === TRUE) {
+				$sucess=$sucess+1;
+			} else {
+			    $fail=fail+1;
+			}
+		}
+
+		$arrayAll = array();
+		if($fail==0 AND $sucess>0){
+			array_push($arrayAll, array('id'=>'set-category-ok','sucess'=>$sucess,'failed'=>$fail));
+			echo json_encode($arrayAll);
+		}
+		else if ($fail>0 AND $sucess>0){
+			array_push($arrayAll, array('id'=>'set-category-ok','sucess'=>$sucess,'failed'=>$fail));
+			echo json_encode($arrayAll);
+		}else{
+			array_push($arrayAll, array('id'=>'set-category-fail','sucess'=>$sucess,'failed'=>$fail));
+			echo json_encode($arrayAll);
+		}
+	}
 	
 	else{
 		echo json_encode(array('id'=>'0x1'));
