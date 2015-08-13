@@ -1262,10 +1262,54 @@ if(isset($_POST['method'])){
 
 	/*
 	@ TIPO DE RETORNO = JSONARRAY
+	ALTERA AS SUBCATEGORIAS
+	*/
+	else if(strcmp('update-pro-category', $_POST['method']) == 0){
+		$data = utf8_encode($_POST['data']);
+		$data = json_decode($data);
+		$id_pro =$_POST['id_pro'];
+		$fail=0;
+		$sucess=0;
+
+		$sql = "DELETE FROM PRO_SUBCAT WHERE ID_PRO=$id_pro";
+
+		$arrayAll = array();
+		if ($conn->query($sql) === TRUE) {
+			$sql="";
+			foreach ($data as $value) {
+				$sql = "INSERT INTO PRO_SUBCAT VALUES($id_pro,$value,NULL)";
+				if ($conn->query($sql) === TRUE) {
+					$sucess=$sucess+1;
+				} else {
+				    $fail=fail+1;
+				}
+			}
+
+			
+			if($fail==0 AND $sucess>0){
+				array_push($arrayAll, array('id'=>'update-category-ok','sucess'=>$sucess,'failed'=>$fail));
+				echo json_encode($arrayAll);
+			}
+			else if ($fail>0 AND $sucess>0){
+				array_push($arrayAll, array('id'=>'update-category-ok','sucess'=>$sucess,'failed'=>$fail));
+				echo json_encode($arrayAll);
+			}else{
+				array_push($arrayAll, array('id'=>'update-category-fail','sucess'=>$sucess,'failed'=>$fail));
+				echo json_encode($arrayAll);
+			}
+		} else {
+		    array_push($arrayAll, array('id'=>'update-category-fail','sucess'=>$sucess,'failed'=>$fail));
+			echo json_encode($arrayAll);
+		}
+		
+	}
+
+	/*
+	@ TIPO DE RETORNO = JSONARRAY
 	RETORNAR TODDAS AS SUBCATEGORIAS DO PROFISSIONAL
 	*/
 	else if(strcmp('get-ref-subcat-by-pro', $_POST['method']) == 0){
-		$id_pro = $_POST['data'];
+		$id_pro = $_POST['id_pro'];
 		$sql = "SELECT *
 				FROM PRO_SUBCAT
 				WHERE ID_PRO=$id_pro";
@@ -1274,7 +1318,8 @@ if(isset($_POST['method'])){
 		$arrayAll = array();
 		if($result->num_rows > 0){
 			foreach($result as $model){
-				$arrayRefSubcatByPro = array('id_pro'=>$model["ID_PRO"],
+				$arrayRefSubcatByPro = array('id'=>'refs-found',
+											 'id_pro'=>$model["ID_PRO"],
 											   'id_subcat'=>$model["ID_SUBCAT"],
 											   'date_time'=>$model["DATE_TIME_PRO_SUBCAT"]);
 				array_push($arrayAll, $arrayRefSubcatByPro);
