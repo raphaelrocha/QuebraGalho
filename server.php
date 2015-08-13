@@ -249,10 +249,12 @@ function saveFile($fileString,$filename){
 
 if(isset($_POST['method'])){
 	if(strcmp('create-pro', $_POST['method']) == 0){ // SEND
-		$data = utf8_encode($_POST['data']);
-		$data2 = utf8_encode($_POST['data2']);
-		$data = json_decode($data);
-		$data2 = json_decode($data2);
+		//$data = utf8_encode($_POST['data']);
+		//$data2 = utf8_encode($_POST['data2']);
+		//$data = json_decode($data);
+		//$data2 = json_decode($data2);
+		$data = json_decode($_POST['data']);
+		$data2 = json_decode($_POST['data2']);
 
 		$username = $data->email;
 		$password = $data->passwd;
@@ -344,8 +346,9 @@ if(isset($_POST['method'])){
 	SALVA UMA FOTO PARA O ALBUM DO PROFISSIONAL
 	*/
 	else if(strcmp('send-photo', $_POST['method']) == 0){
-		$data = utf8_encode($_POST['data']);
-		$data = json_decode($data);
+		//$data = utf8_encode($_POST['data']);
+		//$data = json_decode($data);
+		$data = json_decode($_POST['data']);
 		$fileString = $data->photo;
 		$fileStringRsz = $data->photo_rsz;
 		$legend = $data->legend;
@@ -455,8 +458,9 @@ if(isset($_POST['method'])){
 	CADASTRA O USUÁRIO E RETORNA CONFIRMAÇÃO.
 	*/
 	else if (strcmp('create-user', $_POST['method']) == 0){ // SEND
-		$data = utf8_encode($_POST['data']);
-		$data = json_decode($data);
+		//$data = utf8_encode($_POST['data']);
+		$data = json_decode($_POST['data']);
+		//$data = json_decode($data);
 		$username = $data->email;
 		$password = $data->passwd;
 		$fileString = $data->picture_profile;
@@ -1231,8 +1235,9 @@ if(isset($_POST['method'])){
 	MARCA AS SUBCATEGORIAS
 	*/
 	else if(strcmp('set-category', $_POST['method']) == 0){
-		$data = utf8_encode($_POST['data']);
-		$data = json_decode($data);
+		//$data = utf8_encode($_POST['data']);
+		$data = json_decode($_POST['data']);
+		//$data = json_decode($data);
 		$id_pro =$_POST['id_pro'];
 		$fail=0;
 		$sucess=0;
@@ -1265,8 +1270,9 @@ if(isset($_POST['method'])){
 	ALTERA AS SUBCATEGORIAS
 	*/
 	else if(strcmp('update-pro-category', $_POST['method']) == 0){
-		$data = utf8_encode($_POST['data']);
-		$data = json_decode($data);
+		//$data = utf8_encode($_POST['data']);
+		//$data = json_decode($data);
+		$data = json_decode($_POST['data']);
 		$id_pro =$_POST['id_pro'];
 		$fail=0;
 		$sucess=0;
@@ -1328,6 +1334,23 @@ if(isset($_POST['method'])){
 		}else{
 			array_push($arrayAll, array('id'=>'not_found'));
 			echo json_encode($arrayAll);
+		}
+	}
+
+	/*
+	@TIPO DE RETORNO = JSONOBJECT
+	ATUALIZA A DESCRIÇÃO.
+	*/
+	else if(strcmp('update-description', $_POST['method']) == 0){
+		$id_pro = $_POST['data'];
+		$description = $_POST['data2'];
+
+		$sql = "UPDATE PROFESSIONAL SET DESCRIPTION = '$description' WHERE ID = $id_pro";
+
+		if ($conn->query($sql) === TRUE) {
+		    echo json_encode(array('id'=>'true'));
+		} else {
+		    echo json_encode(array('id'=>'false'));
 		}
 	}
 	
