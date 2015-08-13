@@ -1259,6 +1259,32 @@ if(isset($_POST['method'])){
 			echo json_encode($arrayAll);
 		}
 	}
+
+	/*
+	@ TIPO DE RETORNO = JSONARRAY
+	RETORNAR TODDAS AS SUBCATEGORIAS DO PROFISSIONAL
+	*/
+	else if(strcmp('get-ref-subcat-by-pro', $_POST['method']) == 0){
+		$id_pro = $_POST['data'];
+		$sql = "SELECT *
+				FROM PRO_SUBCAT
+				WHERE ID_PRO=$id_pro";
+
+		$result = $conn->query($sql);
+		$arrayAll = array();
+		if($result->num_rows > 0){
+			foreach($result as $model){
+				$arrayRefSubcatByPro = array('id_pro'=>$model["ID_PRO"],
+											   'id_subcat'=>$model["ID_SUBCAT"],
+											   'date_time'=>$model["DATE_TIME_PRO_SUBCAT"]);
+				array_push($arrayAll, $arrayRefSubcatByPro);
+			}
+			echo json_encode($arrayAll);
+		}else{
+			array_push($arrayAll, array('id'=>'not_found'));
+			echo json_encode($arrayAll);
+		}
+	}
 	
 	else{
 		echo json_encode(array('id'=>'0x1'));
