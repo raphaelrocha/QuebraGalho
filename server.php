@@ -860,6 +860,23 @@ if(isset($_POST['method'])){
 			foreach($result as $model){
 				$arrayLogin = getArrayUser($model);
 			}
+			
+			if($arrayLogin["is_pro"]=="1"){
+				$id_pro = $arrayLogin["id_pro"];
+				$sql = "SELECT COUNT( * ) AS TOTAL
+					FROM  PRO_SUBCAT 
+					WHERE ID_PRO=$id_pro";
+				$resultCount = $conn->query($sql);
+				if($resultCount->num_rows > 0){
+					foreach($resultCount as $model){
+						$arrayLogin['count_cat'] = $model["TOTAL"];
+					}
+				}else{
+					$arrayLogin['count_cat'] = "-1";
+				}
+			}else{
+				$arrayLogin['count_cat'] = "-2";
+			}
 			echo json_encode($arrayLogin);
 		}else{
 			echo json_encode(array('id'=>'-1'));	
