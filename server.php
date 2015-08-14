@@ -316,7 +316,24 @@ if(isset($_POST['method'])){
 					NULL)";
 
 				if ($conn->query($sql) === TRUE) {
-					$sql = "SELECT *,(PROFESSIONAL.ID)AS ID_PRO FROM USER LEFT JOIN PROFESSIONAL ON (USER.ID=PROFESSIONAL.ID_USER)  WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
+					$sql = "SELECT SELECT USER.ID,
+										   USER.NAME,
+										   USER.BIRTH,
+										   USER.SEX,
+										   USER.PICTURE_PROFILE,
+										   USER.SOCIALNET,
+										   USER.IS_PRO,
+										   USER.DATE_TIME_USER,
+										   (PROFESSIONAL.ID)AS ID_PRO,
+										   PROFESSIONAL.BANNER,
+										   PROFESSIONAL.CITY,
+										   PROFESSIONAL.STATE,
+										   PROFESSIONAL.ADDR,
+										   PROFESSIONAL.DISTRICT,
+										   PROFESSIONAL.PHONE1,
+										   PROFESSIONAL.PHONE2,
+										   PROFESSIONAL.LOCATION,
+										   PROFESSIONAL.DATE_TIME_PROF FROM USER LEFT JOIN PROFESSIONAL ON (USER.ID=PROFESSIONAL.ID_USER)  WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
 		
 					$result = $conn->query($sql);
 					if($result->num_rows > 0){
@@ -527,7 +544,24 @@ if(isset($_POST['method'])){
 				NULL)";
 
 			if ($conn->query($sql) === TRUE) {
-			    $sql = "SELECT *,(PROFESSIONAL.ID)AS ID_PRO FROM USER LEFT JOIN PROFESSIONAL ON (USER.ID=PROFESSIONAL.ID_USER) WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
+			    $sql = "SELECT SELECT USER.ID,
+					   USER.NAME,
+					   USER.BIRTH,
+					   USER.SEX,
+					   USER.PICTURE_PROFILE,
+					   USER.SOCIALNET,
+					   USER.IS_PRO,
+					   USER.DATE_TIME_USER,
+					   (PROFESSIONAL.ID)AS ID_PRO,
+					   PROFESSIONAL.BANNER,
+					   PROFESSIONAL.CITY,
+					   PROFESSIONAL.STATE,
+					   PROFESSIONAL.ADDR,
+					   PROFESSIONAL.DISTRICT,
+					   PROFESSIONAL.PHONE1,
+					   PROFESSIONAL.PHONE2,
+					   PROFESSIONAL.LOCATION,
+					   PROFESSIONAL.DATE_TIME_PROF FROM USER LEFT JOIN PROFESSIONAL ON (USER.ID=PROFESSIONAL.ID_USER) WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
 		
 				$result = $conn->query($sql);
 				if($result->num_rows > 0){
@@ -855,7 +889,25 @@ if(isset($_POST['method'])){
 	else if(strcmp('login', $_POST['method']) == 0){
 		$username = $_POST['username'];
 		$password = $_POST['password'];
-		$sql = "SELECT *,(PROFESSIONAL.ID)AS ID_PRO FROM USER LEFT JOIN PROFESSIONAL ON (USER.ID=PROFESSIONAL.ID_USER) WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
+		$sql = "SELECT USER.ID,
+					   USER.NAME,
+					   USER.BIRTH,
+					   USER.SEX,
+					   USER.PICTURE_PROFILE,
+					   USER.SOCIALNET,
+					   USER.IS_PRO,
+					   USER.DATE_TIME_USER,
+					   (PROFESSIONAL.ID)AS ID_PRO,
+					   PROFESSIONAL.BANNER,
+					   PROFESSIONAL.CITY,
+					   PROFESSIONAL.STATE,
+					   PROFESSIONAL.ADDR,
+					   PROFESSIONAL.DISTRICT,
+					   PROFESSIONAL.PHONE1,
+					   PROFESSIONAL.PHONE2,
+					   PROFESSIONAL.LOCATION,
+					   PROFESSIONAL.DATE_TIME_PROF
+					   FROM USER LEFT JOIN PROFESSIONAL ON (USER.ID=PROFESSIONAL.ID_USER) WHERE EMAIL='".$username."' AND PASSWD='".$password."'" ;
 		$lastId;
 		$result = $conn->query($sql);
 		
@@ -893,7 +945,24 @@ if(isset($_POST['method'])){
 	*/
 	else if(strcmp('get-user-by-id', $_POST['method']) == 0){
 		$username = $_POST['data'];
-		$sql = "SELECT *,(PROFESSIONAL.ID)AS ID_PRO FROM USER LEFT JOIN PROFESSIONAL ON (USER.ID=PROFESSIONAL.ID_USER) WHERE EMAIL='".$username."'" ;
+		$sql = "SELECT SELECT USER.ID,
+					   USER.NAME,
+					   USER.BIRTH,
+					   USER.SEX,
+					   USER.PICTURE_PROFILE,
+					   USER.SOCIALNET,
+					   USER.IS_PRO,
+					   USER.DATE_TIME_USER,
+					   (PROFESSIONAL.ID)AS ID_PRO,
+					   PROFESSIONAL.BANNER,
+					   PROFESSIONAL.CITY,
+					   PROFESSIONAL.STATE,
+					   PROFESSIONAL.ADDR,
+					   PROFESSIONAL.DISTRICT,
+					   PROFESSIONAL.PHONE1,
+					   PROFESSIONAL.PHONE2,
+					   PROFESSIONAL.LOCATION,
+					   PROFESSIONAL.DATE_TIME_PROF FROM USER LEFT JOIN PROFESSIONAL ON (USER.ID=PROFESSIONAL.ID_USER) WHERE EMAIL='".$username."'" ;
 		$result = $conn->query($sql);
 
 		if($result->num_rows > 0){
