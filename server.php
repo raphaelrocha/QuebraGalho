@@ -317,6 +317,7 @@ if(isset($_POST['method'])){
 
 				if ($conn->query($sql) === TRUE) {
 					$sql = "SELECT SELECT USER.ID,
+										  USER.EMAIL,
 										   USER.NAME,
 										   USER.BIRTH,
 										   USER.SEX,
@@ -545,6 +546,7 @@ if(isset($_POST['method'])){
 
 			if ($conn->query($sql) === TRUE) {
 			    $sql = "SELECT SELECT USER.ID,
+			    	USER.EMAIL,
 					   USER.NAME,
 					   USER.BIRTH,
 					   USER.SEX,
@@ -890,6 +892,7 @@ if(isset($_POST['method'])){
 		$username = $_POST['username'];
 		$password = $_POST['password'];
 		$sql = "SELECT USER.ID,
+					   USER.EMAIL,
 					   USER.NAME,
 					   USER.BIRTH,
 					   USER.SEX,
@@ -946,6 +949,7 @@ if(isset($_POST['method'])){
 	else if(strcmp('get-user-by-id', $_POST['method']) == 0){
 		$username = $_POST['data'];
 		$sql = "SELECT SELECT USER.ID,
+						USER.EMAIL,
 					   USER.NAME,
 					   USER.BIRTH,
 					   USER.SEX,
