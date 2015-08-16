@@ -1426,6 +1426,40 @@ if(isset($_POST['method'])){
 		    echo json_encode(array('id'=>'false'));
 		}
 	}
+
+	/*
+	@ TIPO DE RETORNO = JSONOBJECT
+	ALTERA AS SUBCATEGORIAS
+	*/
+	else if(strcmp('update-profile', $_POST['method']) == 0){
+		//$data = utf8_encode($_POST['data']);
+		//$data = json_decode($data);
+		list($professional,$user) = explode(";",$_POST['data']);
+		$data2 = json_decode($_POST['data2']);
+
+		$name = $data2->name;
+		$email = $data2->email;
+		$addr = $data2->addr;
+		$phone1 = $data2->phone1;
+		$phone2 = $data2->phone2;
+		$birth = $data2->birth;
+		//$location = $data2->location;
+
+		$sqlUser = "UPDATE USER SET NAME = '$name', EMAIL = '$email', BIRTH = '$birth' WHERE ID=$user";
+
+		if ($conn->query($sqlUser) === TRUE) {
+
+			$sqlProfessional = "UPDATE PROFESSIONAL SET ADDR = '$addr', PHONE1 = '$phone1', PHONE2 = '$phone2' WHERE ID=$professional";	
+			
+			if ($conn->query($sqlProfessional) === TRUE) {
+				echo json_encode(array('id'=>'sucess-update-profile'));
+			}else{
+				echo json_encode(array('id'=>'erro-update-professional'));
+			}
+		}else{
+			echo json_encode(array('id'=>'erro-update-user'));
+		}		
+	}
 	
 	else{
 		echo json_encode(array('id'=>'0x1'));
