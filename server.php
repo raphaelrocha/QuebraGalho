@@ -316,7 +316,7 @@ if(isset($_POST['method'])){
 					NULL)";
 
 				if ($conn->query($sql) === TRUE) {
-					$sql = "SELECT SELECT USER.ID,
+					$sql = "SELECT USER.ID,
 										  USER.EMAIL,
 										   USER.NAME,
 										   USER.BIRTH,
@@ -545,7 +545,7 @@ if(isset($_POST['method'])){
 				NULL)";
 
 			if ($conn->query($sql) === TRUE) {
-			    $sql = "SELECT SELECT USER.ID,
+			    $sql = "SELECT USER.ID,
 			    	USER.EMAIL,
 					   USER.NAME,
 					   USER.BIRTH,
@@ -948,7 +948,7 @@ if(isset($_POST['method'])){
 	*/
 	else if(strcmp('get-user-by-id', $_POST['method']) == 0){
 		$username = $_POST['data'];
-		$sql = "SELECT SELECT USER.ID,
+		$sql = "SELECT USER.ID,
 						USER.EMAIL,
 					   USER.NAME,
 					   USER.BIRTH,
@@ -1372,8 +1372,11 @@ if(isset($_POST['method'])){
 			else if ($fail>0 AND $sucess>0){
 				array_push($arrayAll, array('id'=>'update-category-ok','sucess'=>$sucess,'failed'=>$fail));
 				echo json_encode($arrayAll);
-			}else{
+			}else if ($fail>0 AND $sucess==0){
 				array_push($arrayAll, array('id'=>'update-category-fail','sucess'=>$sucess,'failed'=>$fail));
+				echo json_encode($arrayAll);
+			}else{
+				array_push($arrayAll, array('id'=>'delete-all-category-sucess','sucess'=>$sucess,'failed'=>$fail));
 				echo json_encode($arrayAll);
 			}
 		} else {
@@ -1459,6 +1462,52 @@ if(isset($_POST['method'])){
 		}else{
 			echo json_encode(array('id'=>'erro-update-user'));
 		}		
+	}
+
+	/*
+	@TIPO DE RETORNO = JSONOBJECT
+	ALTERA IMAGEM DO PERFIL.
+	*/
+	else if (strcmp('update-image-user', $_POST['method']) == 0){ // SEND
+		list($idUser,$email,$ext) = explode(";",$_POST['data']);
+		$fileString = $_POST['data2'];
+		
+		$now = date("D M j G:i:s T Y");
+		$filename = md5($email.$now);
+		$filename = $filename.".".$ext ;
+
+		$returnFileSave = saveFile($fileString,$filename);
+					
+		$sql = "UPDATE USER SET PICTURE_PROFILE = '$filename' WHERE ID=$idUser";
+
+		if ($conn->query($sql) === TRUE) {
+			echo json_encode(array('id'=>'update-image-user-sucess','filename'=>$filename));
+		}else {
+			 echo json_encode(array('id'=>'update-image-user-error','filename'=>$filename));//erro de cadastro
+		}
+	}
+
+	/*
+	@TIPO DE RETORNO = JSONOBJECT
+	ALTERA IMAGEM DO BANNER.
+	*/
+	else if (strcmp('update-image-pro', $_POST['method']) == 0){ // SEND
+		list($idPro,$email,$ext) = explode(";",$_POST['data']);
+		$fileString = $_POST['data2'];
+		
+		$now = date("D M j G:i:s T Y");
+		$filename = md5($email.$now);
+		$filename = $filename.".".$ext ;
+
+		$returnFileSave = saveFile($fileString,$filename);
+					
+		$sql = "UPDATE PROFESSIONAL SET BANNER = '$filename' WHERE ID=$idPro";
+
+		if ($conn->query($sql) === TRUE) {
+			echo json_encode(array('id'=>'update-image-banner-sucess','filename'=>$filename));
+		}else {
+			 echo json_encode(array('id'=>'update-image-banner-error','filename'=>$filename));//erro de cadastro
+		}
 	}
 	
 	else{
