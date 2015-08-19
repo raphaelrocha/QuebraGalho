@@ -943,6 +943,63 @@ if(isset($_POST['method'])){
 	}
 
 	/*
+	@TIPO DE RETORNO = JSONOJECT
+	VALIDA LOGIN
+	*/
+	else if(strcmp('get-user-by-id', $_POST['method']) == 0){
+		$idUser = $_POST['id_user'];
+		$sql = "SELECT USER.ID,
+					   USER.EMAIL,
+					   USER.NAME,
+					   USER.BIRTH,
+					   USER.SEX,
+					   USER.PICTURE_PROFILE,
+					   USER.SOCIALNET,
+					   USER.IS_PRO,
+					   USER.DATE_TIME_USER,
+					   (PROFESSIONAL.ID)AS ID_PRO,
+					   PROFESSIONAL.BANNER,
+					   PROFESSIONAL.CITY,
+					   PROFESSIONAL.STATE,
+					   PROFESSIONAL.ADDR,
+					   PROFESSIONAL.DISTRICT,
+					   PROFESSIONAL.PHONE1,
+					   PROFESSIONAL.PHONE2,
+					   PROFESSIONAL.LOCATION,
+					   PROFESSIONAL.DATE_TIME_PROF
+					   FROM USER LEFT JOIN PROFESSIONAL ON (USER.ID=PROFESSIONAL.ID_USER) WHERE USER.ID=".$idUser ;
+		$lastId;
+		$result = $conn->query($sql);
+		
+		if($result->num_rows > 0){
+			$arrayLogin = array();
+			foreach($result as $model){
+				$arrayLogin = getArrayUser($model);
+			}
+			
+			if($arrayLogin["is_pro"]=="1"){
+				$id_pro = $arrayLogin["id_pro"];
+				$sql = "SELECT COUNT( * ) AS TOTAL
+					FROM  PRO_SUBCAT 
+					WHERE ID_PRO=$id_pro";
+				$resultCount = $conn->query($sql);
+				if($resultCount->num_rows > 0){
+					foreach($resultCount as $model){
+						$arrayLogin['count_cat'] = $model["TOTAL"];
+					}
+				}else{
+					$arrayLogin['count_cat'] = "-1";
+				}
+			}else{
+				$arrayLogin['count_cat'] = "-2";
+			}
+			echo json_encode($arrayLogin);
+		}else{
+			echo json_encode(array('id'=>'-1'));	
+		}
+	}
+
+	/*
 	@TIPO DE RETORNO = JSONOBJECT
 	RETORNA UM USUÁRIO
 	*/
