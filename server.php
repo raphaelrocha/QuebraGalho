@@ -1442,17 +1442,20 @@ if(isset($_POST['method'])){
 
 		$name = $data2->name;
 		$email = $data2->email;
+		$city = $data2->city;
+		$state = $data2->state;
+		$district = $data2->district;
 		$addr = $data2->addr;
 		$phone1 = $data2->phone1;
 		$phone2 = $data2->phone2;
 		$birth = $data2->birth;
-		//$location = $data2->location;
+		$location = $data2->location;
 
 		$sqlUser = "UPDATE USER SET NAME = '$name', EMAIL = '$email', BIRTH = '$birth' WHERE ID=$user";
 
 		if ($conn->query($sqlUser) === TRUE) {
 
-			$sqlProfessional = "UPDATE PROFESSIONAL SET ADDR = '$addr', PHONE1 = '$phone1', PHONE2 = '$phone2' WHERE ID=$professional";	
+			$sqlProfessional = "UPDATE PROFESSIONAL SET ADDR = '$addr', PHONE1 = '$phone1', PHONE2 = '$phone2', DISTRICT = '$district', CITY = '$city', STATE ='$state', LOCATION = '$location' WHERE ID=$professional";	
 			
 			if ($conn->query($sqlProfessional) === TRUE) {
 				echo json_encode(array('id'=>'sucess-update-profile'));
