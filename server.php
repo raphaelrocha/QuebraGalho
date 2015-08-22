@@ -258,19 +258,20 @@ if(isset($_POST['method'])){
 
 		$username = $data->email;
 		$password = $data->passwd;
+
 		$fileString = $data->picture_profile;
 		$ext = $data->extension;
-		
+
 		$now = date("D M j G:i:s T Y");
 		$filename = md5($data->email.$now);
 		$filename = $filename.".".$ext ;
 
-
-		if($fileString!="vazio"){
-			$returnFileSave = saveFile($fileString,$filename);
-		}else{
-			$filename="n_perfil.jpg";
-		}
+		$fileStringBanner = $data2->banner;
+		$extBanner = $data2->extension_banner;
+		$now = date("D M j G:i:s T Y");
+		$filenameBanner = md5($data->email.$now.banner);
+		$filenameBanner = $filenameBanner.".".$extBanner ;
+		
 		
 		if(validaEmail($username)){
 		    $sql = "INSERT INTO USER VALUES
@@ -286,20 +287,18 @@ if(isset($_POST['method'])){
 				NULL)";
 
 			if ($conn->query($sql) === TRUE) {
-				$userID = $conn->insert_id;
-				$fileStringBanner = $data2->banner;
-				$extBanner = $data2->extension_banner;
+
 				
-				$now = date("D M j G:i:s T Y");
-				$filenameBanner = md5($data->email.$now.banner);
-				$filenameBanner = $filenameBanner.".".$extBanner ;
 
 				if($fileString!="vazio"){
-					$returnFileSaveBanner = saveFile($fileStringBanner,$filenameBanner);
+					$returnFileSave = saveFile($fileString,$filename);
 				}else{
-					$filenameBanner="default_banner.jpg";
+					$filename="n_perfil.jpg";
 				}
 
+				$userID = $conn->insert_id;
+				
+				
 				$sql = "";
 				$sql = "INSERT INTO PROFESSIONAL VALUES
 					(NULL,
@@ -316,6 +315,13 @@ if(isset($_POST['method'])){
 					NULL)";
 
 				if ($conn->query($sql) === TRUE) {
+					
+
+					if($fileString!="vazio"){
+						$returnFileSaveBanner = saveFile($fileStringBanner,$filenameBanner);
+					}else{
+						$filenameBanner="default_banner.jpg";
+					}
 					$sql = "SELECT USER.ID,
 										  USER.EMAIL,
 										   USER.NAME,
@@ -347,6 +353,9 @@ if(isset($_POST['method'])){
 						echo json_encode(array('id'=>'-1'));//login invalido	
 					}
 				} else {
+					$userID = $conn->insert_id;
+					$sql = "DELETE FROM USER WHERE ID = $userID";
+					$conn->query($sql);
 				    echo json_encode(array('id'=>'-2'));//erro de cadastro
 				}
 			  
@@ -891,6 +900,11 @@ if(isset($_POST['method'])){
 	else if(strcmp('login', $_POST['method']) == 0){
 		$username = $_POST['username'];
 		$password = $_POST['password'];
+
+		$fp = fopen("log.txt", "a");
+		$escreve = fwrite($fp, "exemplo de escrita");
+		fclose($fp);
+
 		$sql = "SELECT USER.ID,
 					   USER.EMAIL,
 					   USER.NAME,
