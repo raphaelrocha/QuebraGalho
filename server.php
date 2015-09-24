@@ -247,6 +247,14 @@ function saveFile($fileString,$filename){
     return true;
 }
 
+function saveLog($msg){
+	$fp = fopen("log_qg.txt", "a");
+	$now = date("D M j G:i:s T Y");
+	$escreve = fwrite($fp, $now."[".$msg."]\n");
+	fclose($fp);
+}
+
+
 if(isset($_POST['method'])){
 	if(strcmp('create-pro', $_POST['method']) == 0){ // SEND
 		//$data = utf8_encode($_POST['data']);
@@ -901,9 +909,10 @@ if(isset($_POST['method'])){
 		$username = $_POST['username'];
 		$password = $_POST['password'];
 
-		$fp = fopen("log.txt", "a");
-		$escreve = fwrite($fp, "exemplo de escrita");
-		fclose($fp);
+		//$fp = fopen("log_qg.txt", "a");
+		//$now = date("D M j G:i:s T Y");
+		//$escreve = fwrite($fp, $now." | "."\n");
+		//fclose($fp);
 
 		$sql = "SELECT USER.ID,
 					   USER.EMAIL,
@@ -944,14 +953,18 @@ if(isset($_POST['method'])){
 					foreach($resultCount as $model){
 						$arrayLogin['count_cat'] = $model["TOTAL"];
 					}
+					saveLog("login: (sucess) ".$username." professional_with_category");
 				}else{
 					$arrayLogin['count_cat'] = "-1";
+					saveLog("login: (sucess) ".$username." professional_without_category");
 				}
 			}else{
 				$arrayLogin['count_cat'] = "-2";
+				saveLog("login: (sucess) ".$username." user_only");
 			}
 			echo json_encode($arrayLogin);
 		}else{
+			saveLog("login: (error) ".$username." invalid");
 			echo json_encode(array('id'=>'-1'));	
 		}
 	}
@@ -1201,7 +1214,7 @@ if(isset($_POST['method'])){
                    		DATE_FORMAT(`DATE_TIME_RESPONSE`,'%d/%m/%Y') AS `DATE_FORMATED_RESPONSE`
                    FROM (COMMENTARY  LEFT JOIN USER ON (COMMENTARY.ID_USER = USER.ID)) LEFT JOIN RESPONSE ON (COMMENTARY.ID=RESPONSE.ID_COMMENTARY) 
                    WHERE ID_USER=$idUserLogged AND ID_PROFESSIONAL=$idProfessional
-                   ORDER BY DATE_TIME_COMMENTARY";
+                   ORDER BY DATE_TIME_COMMENTARY DESC";
 
 		$result = $conn->query($sql);
 
@@ -1237,7 +1250,7 @@ if(isset($_POST['method'])){
                    		DATE_FORMAT(`DATE_TIME_RESPONSE`,'%d/%m/%Y') AS `DATE_FORMATED_RESPONSE`
                    FROM (COMMENTARY  LEFT JOIN USER ON (COMMENTARY.ID_USER = USER.ID)) LEFT JOIN RESPONSE ON (COMMENTARY.ID=RESPONSE.ID_COMMENTARY) 
                    WHERE ID_PROFESSIONAL=$idProfessional 
-                   ORDER BY DATE_TIME_COMMENTARY";
+                   ORDER BY DATE_TIME_COMMENTARY DESC";
 
 		$result = $conn->query($sql);
 		$arrayAll = array();
@@ -1581,6 +1594,111 @@ if(isset($_POST['method'])){
 			echo json_encode(array('id'=>'update-image-banner-sucess','filename'=>$filename));
 		}else {
 			 echo json_encode(array('id'=>'update-image-banner-error','filename'=>$filename));//erro de cadastro
+		}
+	}
+
+
+	/*
+	@TIPO DE RETORNO = JSONOBJECT
+	FAZ UPGRADE DE USUARIO PARA PROFISSIONAL.
+	*/
+	else if (strcmp('upgrade-to-pro', $_POST['method']) == 0){
+		$data = json_decode($_POST["data"]);
+		$data2 = json_decode($_POST["data2"]);
+
+		$username = $data->username;
+		$passwd = $data->passwd;
+
+		$sql = "SELECT * FROM USER 
+				WHERE EMAIL='".$username."' AND PASSWD='".$passwd."'" ;
+
+		$result = $conn->query($sql);
+		
+		if($result->num_rows > 0){
+			
+			$id_user;
+			
+			$fileStringBanner = $data2->banner;
+			$extBanner = $data2->extension_banner;
+			$now = date("D M j G:i:s T Y");
+			$filenameBanner = md5($data->email.$now.banner);
+			$filenameBanner = $filenameBanner.".".$extBanner ;
+
+			foreach ($result as $model) {
+				$id_user = $model["ID"];
+			}
+
+			$sql_create_pro = "INSERT INTO PROFESSIONAL VALUES
+							(NULL,
+							'$id_user',
+							'$filenameBanner',
+							'$data2->city',
+							'$data2->state',
+							'$data2->addr',
+							'$data2->district',
+							'$data2->phone1',
+							'$data2->phone2',
+							'$data2->location',
+							'$data2->description',
+							NULL)";
+			if ( $conn->query($sql_create_pro) === TRUE) {
+
+				if($fileString!="vazio"){
+					$returnFileSaveBanner = saveFile($fileStringBanner,$filenameBanner);
+				}else{
+					$filenameBanner="default_banner.jpg";
+				}
+
+				$sql_update_is_pro =  "UPDATE USER SET IS_PRO=1 WHERE ID=$id_user";
+				if ( $conn->query($sql_update_is_pro) === TRUE) {
+					echo json_encode(array('id'=>'sucess-create-pro'));
+				}else{
+					echo json_encode(array('id'=>'error_update_user'));
+				}				
+			}else{
+				echo json_encode(array('id'=>'error_create_pro',"ID_USER"=>$id_user,"SQL"=>$conn->error));
+			}
+		}else{
+			echo json_encode(array('id'=>'error_invalid_user'));
+		}
+	}
+
+	/*
+	@TIPO DE RETORNO = JSONOBJECT
+	ALTERA DADOS DO USUARIO.
+	*/
+	else if (strcmp('update-user-with-image', $_POST['method']) == 0){ // SEND
+		list($idUser,$email,$ext,$name) = explode(";",$_POST['data']);
+		$fileString = $_POST['data2'];
+		
+		$now = date("D M j G:i:s T Y");
+		$filename = md5($email.$now);
+		$filename = $filename.".".$ext ;
+
+		$returnFileSave = saveFile($fileString,$filename);
+					
+		$sql = "UPDATE USER SET PICTURE_PROFILE = '$filename', NAME = '$name'  WHERE ID=$idUser";
+
+		if ($conn->query($sql) === TRUE) {
+			echo json_encode(array('id'=>'update-user-sucess','filename'=>$filename));
+		}else {
+			 echo json_encode(array('id'=>'update-user-error','filename'=>$filename));//erro de cadastro
+		}
+	}
+
+	/*
+	@TIPO DE RETORNO = JSONOBJECT
+	ALTERA DADOS DO USUARIO SEM FOTO DO PERFIL.
+	*/
+	else if (strcmp('update-user-without-image', $_POST['method']) == 0){ // SEND
+		list($idUser,$name) = explode(";",$_POST['data']);
+							
+		$sql = "UPDATE USER SET NAME = '$name'  WHERE ID=$idUser";
+
+		if ($conn->query($sql) === TRUE) {
+			echo json_encode(array('id'=>'update-user-without-image-sucess','filename'=>""));
+		}else {
+			 echo json_encode(array('id'=>'update-user-without-image-error','filename'=>""));//erro de cadastro
 		}
 	}
 	
